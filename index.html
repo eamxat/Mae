@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animated Lava Lamp</title>
-    <!-- Favicon enlazado correctamente -->
+    <title>Xat Lava Lamp</title>
+    
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/eamxat/Images/refs/heads/main/favicon-16x16.png">
     <style>
         :root {
-            /* Variables para controlar los colores dinámicamente */
+            
             --bg-color: #12121c;
             --glow-c1: rgba(225, 66, 43, 0.65);
             --glow-c2: rgba(225, 66, 43, 0.15);
@@ -22,80 +22,80 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-color: var(--bg-color); /* Color dinámico */
+            background-color: var(--bg-color); 
             overflow: hidden;
             font-family: sans-serif;
-            transition: background-color 0.8s ease; /* Transición suave de fondo */
-            -webkit-touch-callout: none; /* Deshabilita el menú contextual en iOS (Anti-inspección móvil) */
-            -webkit-user-select: none; /* Evita selección de texto en Safari */
-            user-select: none; /* Evita selección de texto general */
+            transition: background-color 0.8s ease; 
+            -webkit-touch-callout: none; 
+            -webkit-user-select: none; 
+            user-select: none; 
         }
 
         .lamp-container {
-            height: 68vh; /* Tamaño ligeramente reducido manteniendo proporción (antes 80vh) */
+            height: 68vh; 
             width: 100%;
-            max-width: 340px; /* Tamaño ligeramente reducido (antes 400px) */
+            max-width: 340px; 
             display: flex;
             justify-content: center;
             align-items: center;
-            position: relative; /* Necesario para posicionar el resplandor detrás */
+            position: relative; 
         }
 
-        /* Nuevo resplandor radial y suave (Smooth & Radial Glow) */
+ 
         .lamp-container::before {
             content: '';
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 80vw; /* Tamaño reducido para concentrar el brillo alrededor de la lámpara */
-            height: 80vw; /* Mismo valor que el width para mantener un círculo perfecto */
-            max-width: 700px; /* Límite máximo para que no cubra toda la pantalla en monitores grandes */
+            width: 80vw; 
+            height: 80vw; 
+            max-width: 700px; 
             max-height: 700px;
             background: radial-gradient(circle at center, var(--glow-c1) 0%, var(--glow-c2) 35%, var(--glow-c3) 70%);
-            filter: blur(60px); /* Desenfoque ajustado a la nueva escala para mantener la suavidad */
-            z-index: -1; /* Asegura que se quede detrás de la lámpara */
+            filter: blur(60px); 
+            z-index: -1; 
             border-radius: 50%;
-            pointer-events: none; /* Evita que interfiera con la interacción del usuario */
-            transition: background 0.8s ease; /* Transición suave de resplandor */
+            pointer-events: none; 
+            transition: background 0.8s ease; 
         }
 
         .lamp {
             height: 100%;
             width: 100%;
-            overflow: visible; /* Asegura que la sombra inferior no se recorte */
+            overflow: visible; 
         }
 
-        /* Contenedor enlazable para el logo inferior derecho */
+
         .site-logo-link {
             position: absolute;
             bottom: 25px;
             right: 30px;
-            z-index: 10; /* Se asegura de estar por encima de todo */
+            z-index: 10; 
             display: inline-block;
         }
 
-        /* Estilos para la imagen del logo */
+        
         .site-logo {
-            width: 65px; /* Tamaño ligeramente pequeño y proporcional */
+            width: 65px; 
             height: auto;
             display: block;
-            transition: transform 0.3s ease; /* Transición suave enfocada en el zoom */
+            transition: transform 0.3s ease; /
         }
 
-        /* Efecto hover en el logo (Solo zoom sutil, sin glow) */
+      
         .site-logo-link:hover .site-logo {
-            transform: scale(1.08); /* Ligero aumento de tamaño elegante y discreto */
+            transform: scale(1.08); 
         }
 
-        /* Estilos para el botón Switch de Colores (Inferior Izquierdo) */
+       
         .color-switch {
             position: absolute;
             bottom: 25px;
             left: 30px;
-            width: 42px; /* Tamaño fijo para hacerlo circular */
+            width: 42px; 
             height: 42px;
-            border-radius: 50%; /* Forma circular limpia */
+            border-radius: 50%; 
             border: 1px solid rgba(255, 255, 255, 0.15);
             background: rgba(255, 255, 255, 0.05);
             cursor: pointer;
@@ -109,18 +109,18 @@
 
         .color-switch:hover {
             background: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3); /* Leve glow al interactuar */
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3); 
             transform: scale(1.08);
             border-color: rgba(255, 255, 255, 0.3);
         }
 
-        /* Nuevo indicador de color dentro del botón (sin iconos) */
+        
         .color-indicator {
-            width: 18px; /* Tamaño ligeramente mayor para compensar la ausencia de icono */
+            width: 18px; 
             height: 18px;
             border-radius: 50%;
-            background-color: rgb(225, 66, 43); /* Color rojo inicial */
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); /* Sombra interna para dar profundidad */
+            background-color: rgb(225, 66, 43); 
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); 
             border: 1px solid rgba(255, 255, 255, 0.3);
             transition: background-color 0.3s ease;
         }
@@ -149,12 +149,12 @@
 </head>
 <body>
 
-    <!-- Botón interactivo para cambiar colores solo con el indicador visual (forma circular y limpia) -->
+    
     <button class="color-switch" id="colorBtn" title="Cambiar color">
         <span class="color-indicator" id="colorIndicator"></span>
     </button>
 
-    <!-- Logo añadido en la esquina inferior derecha, ahora como enlace a xat.com en nueva pestaña -->
+    
     <a href="https://xat.com" target="_blank" class="site-logo-link" title="Ir a xat.com">
         <img src="https://raw.githubusercontent.com/eamxat/Images/7af4ec4622f89c3c332964539fc5991e7a6050bd/xatlogo%20text2.svg" alt="Logo" class="site-logo">
     </a>
@@ -162,7 +162,7 @@
     <div class="lamp-container">
         <svg class="lamp" viewBox="-21 0 100 125">
             <defs>
-                <!-- Fixed filter reference names so the goo effect properly applies -->
+                
                 <filter id="goo">
                     <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"></feGaussianBlur>
                     <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -8" result="color-matrix-filter"></feColorMatrix>
@@ -177,7 +177,7 @@
                     <stop offset="95%" stop-color="#1c2640" />
                 </linearGradient>
                 
-                <!-- Gradiente para la sombra proyectada en el suelo -->
+                
                 <radialGradient id="floor-shadow" cx="50%" cy="50%" r="50%">
                     <stop offset="0%" stop-color="rgba(0, 0, 0, 0.8)" />
                     <stop offset="100%" stop-color="rgba(0, 0, 0, 0)" />
@@ -209,24 +209,18 @@
                 <ellipse cx="30" cy="87" rx="15" ry="10" fill="rgb(225,46,43)" />
             </g>
             
-            <!-- Sombra ajustada más grande y realista (rx=40, ry=4.5) alineada exactamente en la base (cy=119) -->
             <ellipse cx="30" cy="119" rx="40" ry="4.5" fill="url(#floor-shadow)" />
 
-            <!-- Lamp Base and Top -->
             <path fill="url(#dark-blue-base)" d="M 25 1 L 21 19 Q 30 21 39 19 L 35 1 Q 30 0 25 1" stroke="#0b0f19" stroke-width=".5" />
             <path fill="url(#dark-blue-base)" d="M 12 83 L 19 100 Q 30 102 41 100 L 48 83 Q 30 88 12 83" stroke="#0b0f19" stroke-width=".5" />
             
-            <!-- Base modificada para ser completamente plana (horizontal) en su extremo inferior (Cambiado a 'L 52 119') -->
             <path fill="url(#dark-blue-base)" d="M 19 100 L 8 119 L 52 119 L 41 100 Q 30 102 19 100z" stroke="#0b0f19" stroke-width=".5" />
             
-            <!-- Lamp Glass Curve -->
             <path fill="url(#glass)" d="M 21 19 C 19 29 6 68 9 75 L 12 83 Q 30 88 48 83 L 51 75 C 54 68 41 29 39 19 Q 30 21 21 19" stroke="#ccc" stroke-width=".3" />
         </svg>
     </div>
 
-    <!-- Script de lógica de colores dinámicos -->
     <script>
-        // Paletas de color (Fondo, Color Principal, Color Secundario, Color Base inferior)
         const colors = [
             { bg: '#12121c', p: '225,66,43',  s: '205,46,43',  b: '225,46,43' },  // Rojo (Original)
             { bg: '#0b1a12', p: '43,225,120', s: '34,180,90',  b: '43,200,100' }, // Verde
@@ -241,59 +235,45 @@
             colorIdx = (colorIdx + 1) % colors.length;
             const c = colors[colorIdx];
 
-            // 1. Cambiar CSS global (Fondo y Resplandor)
             document.documentElement.style.setProperty('--bg-color', c.bg);
             document.documentElement.style.setProperty('--glow-c1', `rgba(${c.p}, 0.65)`);
             document.documentElement.style.setProperty('--glow-c2', `rgba(${c.p}, 0.15)`);
             document.documentElement.style.setProperty('--glow-c3', `rgba(${c.p}, 0)`);
 
-            // 1.5 Cambiar el color del indicador visual en el botón
             document.getElementById('colorIndicator').style.backgroundColor = `rgb(${c.p})`;
 
-            // 2. Cambiar los nodos estáticos y animados de la lava en el SVG
             const ellipses = document.querySelectorAll('.gloops ellipse');
             ellipses.forEach((el, index) => {
                 if (index < 3) {
-                    // Burbujas animadas
                     el.setAttribute('fill', `rgb(${c.s})`);
                     const anim = el.querySelector('animate[attributeName="fill"]');
                     if (anim) anim.setAttribute('values', `rgb(${c.p}); rgb(${c.s}); rgb(${c.p})`);
                 } else if (index === 3) {
-                    // Gotita superior estática
                     el.setAttribute('fill', `rgb(${c.p})`);
                 } else if (index === 4) {
-                    // Piscina base estática
                     el.setAttribute('fill', `rgb(${c.b})`);
                 }
             });
         });
 
-        // --- SISTEMA ANTI-INSPECCIÓN ---
         
-        // 1. Bloquear clic derecho (menú contextual)
         document.addEventListener('contextmenu', (e) => {
             e.preventDefault();
         });
 
-        // 2. Bloquear atajos de teclado de herramientas de desarrollador
         document.addEventListener('keydown', (e) => {
-            // Bloquear F12
             if (e.key === 'F12') {
                 e.preventDefault();
             }
-            // Bloquear Ctrl+Shift+I (Windows) / Cmd+Opt+I (Mac)
             if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'i')) {
                 e.preventDefault();
             }
-            // Bloquear Ctrl+Shift+J (Windows) / Cmd+Opt+J (Mac)
             if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'J' || e.key === 'j')) {
                 e.preventDefault();
             }
-            // Bloquear Ctrl+Shift+C (Windows) / Cmd+Opt+C (Mac)
             if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'C' || e.key === 'c')) {
                 e.preventDefault();
             }
-            // Bloquear Ctrl+U / Cmd+U (Ver código fuente)
             if ((e.ctrlKey || e.metaKey) && (e.key === 'U' || e.key === 'u')) {
                 e.preventDefault();
             }
