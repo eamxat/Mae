@@ -1,789 +1,303 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SELKIT REPRO XAT</title>
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <title>Animated Lava Lamp</title>
+    <!-- Favicon enlazado correctamente -->
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/eamxat/Images/refs/heads/main/favicon-16x16.png">
     <style>
-        /* Embed Reset */
-        *, *::before, *::after {
-            box-sizing: border-box;
+        :root {
+            /* Variables para controlar los colores dinámicamente */
+            --bg-color: #12121c;
+            --glow-c1: rgba(225, 66, 43, 0.65);
+            --glow-c2: rgba(225, 66, 43, 0.15);
+            --glow-c3: rgba(225, 66, 43, 0);
         }
 
-        body, html {
+        body {
             margin: 0;
             padding: 0;
-            background: transparent;
-        }
-
-        /* Variables */
-        :root {
-            --pastel-pink: #ff8acb;
-            --soft-lilac: #caa6ff;
-            --light-lavender: #efe7ff;
-            --glass-bg: rgba(0, 0, 0, 0.65);
-            --glass-border: rgba(255, 138, 203, 0.4);
-        }
-
-        /* STRICT SIZE CONTAINER */
-        .radio-widget {
-            position: relative;
-            width: 637px;
-            height: 363px;
-            font-family: 'Poppins', sans-serif;
-            border-radius: 12px;
-            overflow: hidden;
-            background-color: #000;
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            user-select: none;
-            display: block;
-        }
-
-        /* Video Background - NO BLUR */
-        .bg-video {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 1;
-        }
-
-        /* Light Dark Overlay for Contrast */
-        .video-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.3);
-            z-index: 2;
-        }
-
-        /* Reusable UI Elements */
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-
-        button {
-            cursor: pointer;
-            outline: none;
-            border: none;
-            font-family: 'Poppins', sans-serif;
-            transition: all 0.3s ease;
-        }
-
-        /* Top Left Panel (Clock) */
-        .top-left-panel {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            z-index: 10;
-            padding: 5px 15px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .date-text {
-            color: var(--pastel-pink);
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .time-text {
-            color: #fff;
-            font-size: 22px;
-            font-weight: 700;
-            line-height: 1.1;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
-        }
-
-        /* Top Right Panel (Icons) */
-        .top-right-panel {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            z-index: 10;
             display: flex;
-            gap: 10px;
-        }
-
-        .top-btn {
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--light-lavender);
-            font-size: 16px;
-            display: flex;
-            align-items: center;
             justify-content: center;
-        }
-
-        .top-btn:hover {
-            color: #fff;
-            border-color: var(--pastel-pink);
-            box-shadow: 0 0 10px rgba(255, 138, 203, 0.3);
-        }
-
-        #warning-btn {
-            color: var(--pastel-pink);
-        }
-
-        #warning-btn:hover {
-            text-shadow: 0 0 10px var(--pastel-pink);
-            transform: scale(1.05);
-        }
-
-        /* Bottom Control Bar */
-        .bottom-bar {
-            position: absolute;
-            bottom: 12px;
-            left: 12px;
-            right: 12px;
-            height: 80px;
-            border-radius: 20px;
-            z-index: 10;
-            display: flex;
             align-items: center;
-            padding: 0 15px;
-            gap: 15px;
-        }
-
-        /* Left Side: Play & Album */
-        .bar-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .main-play-btn {
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            background: rgba(0, 0, 0, 0.8);
-            border: 2px solid var(--pastel-pink);
-            color: #fff;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 15px rgba(255, 138, 203, 0.4);
-            padding-left: 4px; /* optical centering */
-            flex-shrink: 0;
-        }
-
-        .main-play-btn.playing {
-            padding-left: 0;
-            color: var(--soft-lilac);
-            border-color: var(--soft-lilac);
-            box-shadow: 0 0 15px rgba(202, 166, 255, 0.4);
-        }
-
-        .main-play-btn:hover {
-            transform: scale(1.05);
-            background: rgba(255, 138, 203, 0.1);
-        }
-
-        .album-wrapper {
-            position: relative;
-            width: 55px;
-            height: 55px;
-            flex-shrink: 0;
-        }
-
-        #sonic_art {
-            width: 100%;
-            height: 100%;
-            border-radius: 10px;
+            min-height: 100vh;
+            background-color: var(--bg-color); /* Color dinámico */
             overflow: hidden;
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-            background: rgba(255,255,255,0.1); /* fallback */
+            font-family: sans-serif;
+            transition: background-color 0.8s ease; /* Transición suave de fondo */
+            -webkit-touch-callout: none; /* Deshabilita el menú contextual en iOS (Anti-inspección móvil) */
+            -webkit-user-select: none; /* Evita selección de texto en Safari */
+            user-select: none; /* Evita selección de texto general */
         }
 
-        #sonic_art img {
+        .lamp-container {
+            height: 80vh;
             width: 100%;
-            height: 100%;
-            object-fit: cover;
+            max-width: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative; /* Necesario para posicionar el resplandor detrás */
         }
 
-        .al-aire-badge {
+        /* Nuevo resplandor radial y suave (Smooth & Radial Glow) */
+        .lamp-container::before {
+            content: '';
             position: absolute;
-            top: -8px;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
-            background: var(--pastel-pink);
-            color: #000;
-            font-size: 9px;
-            font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            white-space: nowrap;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-            z-index: 2;
-        }
-
-        .al-aire-dot {
-            width: 5px;
-            height: 5px;
-            background: #fff;
+            transform: translate(-50%, -50%);
+            width: 80vw; /* Tamaño reducido para concentrar el brillo alrededor de la lámpara */
+            height: 80vw; /* Mismo valor que el width para mantener un círculo perfecto */
+            max-width: 700px; /* Límite máximo para que no cubra toda la pantalla en monitores grandes */
+            max-height: 700px;
+            background: radial-gradient(circle at center, var(--glow-c1) 0%, var(--glow-c2) 35%, var(--glow-c3) 70%);
+            filter: blur(60px); /* Desenfoque ajustado a la nueva escala para mantener la suavidad */
+            z-index: -1; /* Asegura que se quede detrás de la lámpara */
             border-radius: 50%;
-            animation: pulse-dot 1.5s infinite;
+            pointer-events: none; /* Evita que interfiera con la interacción del usuario */
+            transition: background 0.8s ease; /* Transición suave de resplandor */
         }
 
-        /* Center Area */
-        .bar-center {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            overflow: hidden;
-            gap: 6px;
+        .lamp {
+            height: 100%;
+            width: 100%;
+            overflow: visible; /* Asegura que la sombra inferior no se recorte */
         }
 
-        .title-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        #sonic_title {
-            color: #fff;
-            font-size: 13px;
-            font-weight: 500;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-        }
-
-        /* Equalizer */
-        .equalizer {
-            display: flex;
-            align-items: flex-end;
-            gap: 2px;
-            height: 12px;
-            flex-shrink: 0;
-        }
-
-        .eq-bar {
-            width: 3px;
-            background: var(--soft-lilac);
-            border-radius: 2px;
-            height: 3px;
-            box-shadow: 0 0 5px var(--soft-lilac);
-            transition: height 0.2s ease;
-        }
-
-        .equalizer.active .eq-bar {
-            background: var(--pastel-pink);
-            box-shadow: 0 0 5px var(--pastel-pink);
-            animation: eq-play 1s infinite alternate ease-in-out;
-        }
-
-        .equalizer.active .eq-bar:nth-child(1) { animation-delay: 0.1s; animation-duration: 0.6s; }
-        .equalizer.active .eq-bar:nth-child(2) { animation-delay: 0.3s; animation-duration: 0.8s; }
-        .equalizer.active .eq-bar:nth-child(3) { animation-delay: 0.0s; animation-duration: 0.5s; }
-
-        @keyframes eq-play {
-            0% { height: 3px; }
-            100% { height: 12px; }
-        }
-
-        /* Badges Row */
-        .badges-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .info-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
-            font-size: 10px;
-            font-weight: 500;
-            padding: 3px 10px;
-            border-radius: 12px;
-            white-space: nowrap;
-        }
-
-        #sonic_listeners, #sonic_dj {
+        /* Contenedor enlazable para el logo inferior derecho */
+        .site-logo-link {
+            position: absolute;
+            bottom: 25px;
+            right: 30px;
+            z-index: 10; /* Se asegura de estar por encima de todo */
             display: inline-block;
         }
 
-        .pausa-btn {
-            background: transparent;
-            border: 1px solid var(--soft-lilac);
-            color: var(--soft-lilac);
-            font-size: 10px;
-            font-weight: 600;
-            padding: 3px 12px;
-            border-radius: 12px;
-            text-transform: uppercase;
+        /* Estilos para la imagen del logo */
+        .site-logo {
+            width: 65px; /* Tamaño ligeramente pequeño y proporcional */
+            height: auto;
+            display: block;
+            transition: transform 0.3s ease; /* Transición suave enfocada en el zoom */
         }
 
-        .pausa-btn:hover {
-            background: rgba(202, 166, 255, 0.2);
-            color: #fff;
+        /* Efecto hover en el logo (Solo zoom sutil, sin glow) */
+        .site-logo-link:hover .site-logo {
+            transform: scale(1.08); /* Ligero aumento de tamaño elegante y discreto */
         }
 
-        .pausa-btn.playing {
-            border-color: var(--pastel-pink);
-            color: var(--pastel-pink);
-        }
-
-        /* Additional Space Image Container */
-        .empty-space-image {
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 10px;
-        }
-
-        /* Right Controls */
-        .bar-right {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-
-        .action-btn {
-            width: 34px;
-            height: 34px;
-            border-radius: 8px;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--light-lavender);
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .action-btn:hover {
-            color: #fff;
-            border-color: var(--pastel-pink);
-            box-shadow: 0 0 8px rgba(255, 138, 203, 0.3);
-        }
-
-        .vol-container {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            padding-right: 8px;
-        }
-
-        .vol-container .action-btn {
-            border: none;
-            background: transparent;
-            box-shadow: none;
-        }
-
-        input[type="range"] {
-            -webkit-appearance: none;
-            width: 50px;
-            height: 4px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 2px;
-            outline: none;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--pastel-pink);
+        /* Estilos para el botón Switch de Colores (Inferior Izquierdo) */
+        .color-switch {
+            position: absolute;
+            bottom: 25px;
+            left: 30px;
+            width: 42px; /* Tamaño fijo para hacerlo circular */
+            height: 42px;
+            border-radius: 50%; /* Forma circular limpia */
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.05);
             cursor: pointer;
-            box-shadow: 0 0 5px var(--pastel-pink);
-        }
-
-        /* Modal Warning Popup */
-        .modal-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 100;
+            z-index: 10;
             display: flex;
             justify-content: center;
             align-items: center;
-            visibility: hidden;
-            opacity: 0;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
         }
 
-        .modal-overlay.show {
-            visibility: visible;
-            opacity: 1;
+        .color-switch:hover {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3); /* Leve glow al interactuar */
+            transform: scale(1.08);
+            border-color: rgba(255, 255, 255, 0.3);
         }
 
-        .modal-content {
-            background: rgba(20, 15, 30, 0.85);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--pastel-pink);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 20px rgba(255, 138, 203, 0.2);
-            padding: 30px 25px;
-            border-radius: 16px;
-            text-align: center;
-            width: 85%;
-            transform: scale(0.9);
-            transition: transform 0.3s ease;
+        /* Nuevo indicador de color dentro del botón (sin iconos) */
+        .color-indicator {
+            width: 18px; /* Tamaño ligeramente mayor para compensar la ausencia de icono */
+            height: 18px;
+            border-radius: 50%;
+            background-color: rgb(225, 66, 43); /* Color rojo inicial */
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); /* Sombra interna para dar profundidad */
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: background-color 0.3s ease;
         }
 
-        .modal-overlay.show .modal-content {
-            transform: scale(1);
+        /* Responsivo para móviles */
+        @media (max-width: 768px) {
+            .site-logo-link {
+                bottom: 15px;
+                right: 20px;
+            }
+            .site-logo {
+                width: 50px;
+            }
+            .color-switch {
+                bottom: 15px;
+                left: 20px;
+                width: 36px;
+                height: 36px;
+            }
+            .color-indicator {
+                width: 15px;
+                height: 15px;
+            }
         }
-
-        .modal-content p {
-            color: #fff;
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 20px;
-            letter-spacing: 0.5px;
-        }
-
-        .close-btn {
-            background: rgba(255, 138, 203, 0.15);
-            border: 1px solid var(--pastel-pink);
-            color: var(--pastel-pink);
-            padding: 6px 20px;
-            border-radius: 15px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .close-btn:hover {
-            background: var(--pastel-pink);
-            color: #000;
-        }
-
-        /* Animations */
-        @keyframes pulse-dot {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.8); }
-            70% { transform: scale(1); box-shadow: 0 0 0 4px rgba(255, 255, 255, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
-        }
-        .fa-spinner {
-            animation: spin 1s linear infinite;
-            padding-left: 0 !important;
-        }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        /* Particle System CSS */
-        .music-particle {
-            position: absolute;
-            pointer-events: none;
-            font-size: 14px;
-            z-index: 5;
-            animation: floatUp 1.5s ease-out forwards;
-        }
-        @keyframes floatUp {
-            0% { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-40px) scale(1.5); opacity: 0; }
-        }
-
     </style>
 </head>
 <body>
 
-    <!-- Container STRICT 637x363 -->
-    <div class="radio-widget" id="radio-widget">
-        
-        <!-- Background Video (NO BLUR) -->
-        <video class="bg-video" autoplay loop muted playsinline>
-            <source src="https://i.imgur.com/Yttz3wP.mp4" type="video/mp4">
-        </video>
-        <div class="video-overlay"></div>
+    <!-- Botón interactivo para cambiar colores solo con el indicador visual (forma circular y limpia) -->
+    <button class="color-switch" id="colorBtn" title="Cambiar color">
+        <span class="color-indicator" id="colorIndicator"></span>
+    </button>
 
-        <!-- Warning Modal -->
-        <div class="modal-overlay" id="warning-modal">
-            <div class="modal-content">
-                <p>ESTE REPRODUCTOR ES EXCLUSIVO DE XAT.COM/SELKIT</p>
-                <button class="close-btn" id="close-modal">Cerrar</button>
-            </div>
-        </div>
+    <!-- Logo añadido en la esquina inferior derecha, ahora como enlace a xat.com en nueva pestaña -->
+    <a href="https://xat.com" target="_blank" class="site-logo-link" title="Ir a xat.com">
+        <img src="https://raw.githubusercontent.com/eamxat/Images/7af4ec4622f89c3c332964539fc5991e7a6050bd/xatlogo%20text2.svg" alt="Logo" class="site-logo">
+    </a>
 
-        <!-- Top Left: Clock -->
-        <div class="top-left-panel glass-panel">
-            <div class="date-text" id="date-text">MIE 11/3</div>
-            <div class="time-text" id="time-text">00:00</div>
-        </div>
-
-        <!-- Top Right: Icons -->
-        <div class="top-right-panel">
-            <button class="top-btn glass-panel" id="warning-btn" title="Advertencia">
-                <i class="fas fa-exclamation-triangle"></i>
-            </button>
-        </div>
-
-        <!-- Bottom Bar -->
-        <div class="bottom-bar glass-panel">
-            
-            <div class="bar-left">
-                <button class="main-play-btn" id="main-play-btn">
-                    <i class="fas fa-play" id="main-play-icon"></i>
-                </button>
+    <div class="lamp-container">
+        <svg class="lamp" viewBox="-21 0 100 125">
+            <defs>
+                <!-- Fixed filter reference names so the goo effect properly applies -->
+                <filter id="goo">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"></feGaussianBlur>
+                    <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -8" result="color-matrix-filter"></feColorMatrix>
+                    <feComposite in="SourceGraphic" in2="color-matrix-filter" operator="atop"></feComposite>
+                </filter>
+                <linearGradient id="glass" gradientTransform="rotate(0)">
+                    <stop offset="15%"  stop-color="rgba(255,255,255,0)" />
+                    <stop offset="95%" stop-color="rgba(255,255,255,0.3)" />
+                </linearGradient>
+                <linearGradient id="dark-blue-base" gradientTransform="rotate(0)">
+                    <stop offset="15%"  stop-color="#0b0f19" />
+                    <stop offset="95%" stop-color="#1c2640" />
+                </linearGradient>
                 
-                <div class="album-wrapper">
-                    <div class="al-aire-badge">
-                        <div class="al-aire-dot"></div>AL AIRE
-                    </div>
-                    <!-- Sonic Art Widget -->
-                    <div id='sonic_art'></div>
-                </div>
-            </div>
+                <!-- Gradiente para la sombra proyectada en el suelo -->
+                <radialGradient id="floor-shadow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="rgba(0, 0, 0, 0.8)" />
+                    <stop offset="100%" stop-color="rgba(0, 0, 0, 0)" />
+                </radialGradient>
+            </defs>
+            <g class="gloops" filter="url(#goo)">
+                <ellipse rx="10%" ry="10%" class="circle" fill="rgb(205,46,43)">
+                    <animate attributeName="cx" values="28%; 33%; 28%" dur="12s" repeatCount="indefinite" />
+                    <animate attributeName="cy" values="16%; 69%; 16%" dur="12.2s" repeatCount="indefinite" keyTimes="0;0.6;1" />
+                    <animate attributeName="rx" values="7%; 4%; 7%" dur="10.4s" begin="-1" repeatCount="indefinite" />
+                    <animate attributeName="ry" values="7%; 4%; 7%" dur="19.4s" begin="-3" repeatCount="indefinite" />
+                    <animate attributeName="fill" values="rgb(225,66,43); rgb(205,46,43); rgb(225,66,43)" dur="10s" begin="-1" repeatCount="indefinite" />
+                </ellipse>
+                <ellipse r="10%" class="circle" fill="rgb(205,46,43)">
+                    <animate attributeName="cx" values="28%; 33%; 28%" dur="11.2s" begin="-12" repeatCount="indefinite" />
+                    <animate attributeName="cy" values="16%; 69%; 16%" dur="14.1s" begin="-4" repeatCount="indefinite" keyTimes="0;0.6;1" />
+                    <animate attributeName="rx" values="7%; 4%; 7%" dur="9.4s" begin="-5" repeatCount="indefinite" />
+                    <animate attributeName="ry" values="7%; 4%; 7%" dur="10.4s" begin="-3" repeatCount="indefinite" />
+                    <animate attributeName="fill" values="rgb(225,66,43); rgb(205,46,43); rgb(225,66,43)" dur="10s" begin="-1" repeatCount="indefinite" />
+                </ellipse>
+                <ellipse r="10%" class="circle" fill="rgb(205,46,43)">
+                    <animate attributeName="cx" values="28%; 33%; 28%" dur="11.7s" begin="-6" repeatCount="indefinite" />
+                    <animate attributeName="cy" values="16%; 69%; 16%" dur="16.4s" begin="-9" repeatCount="indefinite" keyTimes="0;0.6;1" />
+                    <animate attributeName="rx" values="7%; 4%; 7%" dur="7.4s" begin="-4" repeatCount="indefinite" />
+                    <animate attributeName="ry" values="7%; 4%; 7%" dur="13.4s" begin="-5" repeatCount="indefinite" />
+                    <animate attributeName="fill" values="rgb(225,66,43); rgb(205,46,43); rgb(225,66,43)" dur="10s" begin="-1" repeatCount="indefinite" />
+                </ellipse>
+                <ellipse cx="30" cy="18" rx="7" ry="4" fill="rgb(225,66,43)" />
+                <ellipse cx="30" cy="87" rx="15" ry="10" fill="rgb(225,46,43)" />
+            </g>
+            
+            <!-- Sombra ajustada más grande y realista (rx=40, ry=4.5) alineada exactamente en la base (cy=119) -->
+            <ellipse cx="30" cy="119" rx="40" ry="4.5" fill="url(#floor-shadow)" />
 
-            <div class="bar-center">
-                <div class="title-row">
-                    <!-- Sonic Title Widget -->
-                    <div id='sonic_title'></div>
-                    <div class="equalizer" id="equalizer">
-                        <div class="eq-bar"></div>
-                        <div class="eq-bar"></div>
-                        <div class="eq-bar"></div>
-                    </div>
-                </div>
-                <div class="badges-row">
-                    <div class="info-badge">DJ: <div id='sonic_dj'></div></div>
-                    <div class="info-badge">Oyentes: <div id='sonic_listeners'></div></div>
-                    <button class="pausa-btn" id="pausa-btn">PLAY</button>
-                </div>
-            </div>
-
-            <!-- New Image in Empty Space -->
-            <div class="empty-space-image">
-                <img src="https://i.ibb.co/Txh2DbGQ/a-lapin-lbdj-onair-20.webp" alt="On Air" style="display: block;">
-            </div>
-
-            <div class="bar-right">
-                <div class="vol-container">
-                    <button class="action-btn" id="vol-icon-btn"><i class="fas fa-volume-up" id="vol-icon"></i></button>
-                    <input type="range" id="vol-slider" min="0" max="1" step="0.01" value="0.75">
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Invisible Audio Element -->
-        <audio id="audio-stream" src="https://fire.doscast.com/8004/stream" crossorigin="anonymous"></audio>
+            <!-- Lamp Base and Top -->
+            <path fill="url(#dark-blue-base)" d="M 25 1 L 21 19 Q 30 21 39 19 L 35 1 Q 30 0 25 1" stroke="#0b0f19" stroke-width=".5" />
+            <path fill="url(#dark-blue-base)" d="M 12 83 L 19 100 Q 30 102 41 100 L 48 83 Q 30 88 12 83" stroke="#0b0f19" stroke-width=".5" />
+            
+            <!-- Base modificada para ser completamente plana (horizontal) en su extremo inferior (Cambiado a 'L 52 119') -->
+            <path fill="url(#dark-blue-base)" d="M 19 100 L 8 119 L 52 119 L 41 100 Q 30 102 19 100z" stroke="#0b0f19" stroke-width=".5" />
+            
+            <!-- Lamp Glass Curve -->
+            <path fill="url(#glass)" d="M 21 19 C 19 29 6 68 9 75 L 12 83 Q 30 88 48 83 L 51 75 C 54 68 41 29 39 19 Q 30 21 21 19" stroke="#ccc" stroke-width=".3" />
+        </svg>
     </div>
 
-    <!-- Sonic / Doscast Scripts -->
-    <script id='sonic_js' data-port='8004' src='https://fire.doscast.com/cp/widgets.js?r=976'></script>
-
+    <!-- Script de lógica de colores dinámicos -->
     <script>
-        // --- Elements ---
-        const audio = document.getElementById('audio-stream');
-        const mainPlayBtn = document.getElementById('main-play-btn');
-        const mainPlayIcon = document.getElementById('main-play-icon');
-        const pausaBtn = document.getElementById('pausa-btn');
-        const equalizer = document.getElementById('equalizer');
-        const volSlider = document.getElementById('vol-slider');
-        const volIcon = document.getElementById('vol-icon');
-        const radioWidget = document.getElementById('radio-widget');
+        // Paletas de color (Fondo, Color Principal, Color Secundario, Color Base inferior)
+        const colors = [
+            { bg: '#12121c', p: '225,66,43',  s: '205,46,43',  b: '225,46,43' },  // Rojo (Original)
+            { bg: '#0b1a12', p: '43,225,120', s: '34,180,90',  b: '43,200,100' }, // Verde
+            { bg: '#0b141a', p: '43,150,225', s: '34,120,200', b: '43,130,210' }, // Azul
+            { bg: '#170b1a', p: '160,43,225', s: '130,34,200', b: '150,43,210' }, // Morado
+            { bg: '#1a180b', p: '225,200,43', s: '200,170,34',  b: '225,180,43' }  // Amarillo
+        ];
         
-        // Modal Elements
-        const warningBtn = document.getElementById('warning-btn');
-        const warningModal = document.getElementById('warning-modal');
-        const closeModal = document.getElementById('close-modal');
+        let colorIdx = 0;
 
-        let isPlaying = false;
-        let isLoading = false;
-        let reconnectTimeout;
+        document.getElementById('colorBtn').addEventListener('click', () => {
+            colorIdx = (colorIdx + 1) % colors.length;
+            const c = colors[colorIdx];
 
-        // --- Clock & Date (Spanish) ---
-        function updateClock() {
-            const now = new Date();
-            
-            // Time
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById('time-text').textContent = `${hours}:${minutes}`;
+            // 1. Cambiar CSS global (Fondo y Resplandor)
+            document.documentElement.style.setProperty('--bg-color', c.bg);
+            document.documentElement.style.setProperty('--glow-c1', `rgba(${c.p}, 0.65)`);
+            document.documentElement.style.setProperty('--glow-c2', `rgba(${c.p}, 0.15)`);
+            document.documentElement.style.setProperty('--glow-c3', `rgba(${c.p}, 0)`);
 
-            // Date Format: MIE 11/3
-            const days = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB'];
-            const dayName = days[now.getDay()];
-            const dayNum = now.getDate();
-            const monthNum = now.getMonth() + 1;
-            document.getElementById('date-text').textContent = `${dayName} ${dayNum}/${monthNum}`;
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
+            // 1.5 Cambiar el color del indicador visual en el botón
+            document.getElementById('colorIndicator').style.backgroundColor = `rgb(${c.p})`;
 
-        // --- Modal ---
-        warningBtn.addEventListener('click', () => {
-            warningModal.classList.add('show');
-        });
-        closeModal.addEventListener('click', () => {
-            warningModal.classList.remove('show');
-        });
-        warningModal.addEventListener('click', (e) => {
-            if (e.target === warningModal) warningModal.classList.remove('show');
-        });
-
-        // --- Audio Logic ---
-        function togglePlay() {
-            if (audio.paused) {
-                setLoadingState(true);
-                audio.load(); // catch live edge
-                audio.play().catch(err => {
-                    console.error("Playback failed:", err);
-                    setLoadingState(false);
-                    setPlayingState(false);
-                });
-            } else {
-                audio.pause();
-                setPlayingState(false);
-            }
-        }
-
-        mainPlayBtn.addEventListener('click', togglePlay);
-        pausaBtn.addEventListener('click', togglePlay);
-
-        audio.addEventListener('playing', () => {
-            clearTimeout(reconnectTimeout);
-            setLoadingState(false);
-            setPlayingState(true);
-        });
-
-        audio.addEventListener('waiting', () => {
-            setLoadingState(true);
-        });
-
-        audio.addEventListener('pause', () => {
-            setPlayingState(false);
-        });
-
-        // Auto-reconnect
-        audio.addEventListener('error', () => {
-            setLoadingState(false);
-            setPlayingState(false);
-            clearTimeout(reconnectTimeout);
-            if (isPlaying || isLoading) {
-                reconnectTimeout = setTimeout(() => {
-                    setLoadingState(true);
-                    audio.load();
-                    audio.play().catch(() => setLoadingState(false));
-                }, 5000);
-            }
-        });
-
-        function setPlayingState(state) {
-            isPlaying = state;
-            if (isPlaying) {
-                mainPlayIcon.className = 'fas fa-pause';
-                mainPlayBtn.classList.add('playing');
-                equalizer.classList.add('active');
-                pausaBtn.textContent = "PAUSA";
-                pausaBtn.classList.add('playing');
-            } else {
-                mainPlayIcon.className = 'fas fa-play';
-                mainPlayBtn.classList.remove('playing');
-                equalizer.classList.remove('active');
-                pausaBtn.textContent = "PLAY";
-                pausaBtn.classList.remove('playing');
-            }
-        }
-
-        function setLoadingState(state) {
-            isLoading = state;
-            if (isLoading) {
-                mainPlayIcon.className = 'fas fa-spinner';
-                equalizer.classList.remove('active');
-            } else {
-                setPlayingState(isPlaying);
-            }
-        }
-
-        // --- Volume Logic ---
-        volSlider.addEventListener('input', (e) => {
-            const val = e.target.value;
-            audio.volume = val;
-            if (val == 0) {
-                volIcon.className = 'fas fa-volume-mute';
-            } else if (val < 0.5) {
-                volIcon.className = 'fas fa-volume-down';
-            } else {
-                volIcon.className = 'fas fa-volume-up';
-            }
-        });
-        audio.volume = volSlider.value;
-
-        // --- Music Particle Effect ---
-        const particleContainer = document.createElement('div');
-        particleContainer.style.position = 'absolute';
-        particleContainer.style.top = '0';
-        particleContainer.style.left = '0';
-        particleContainer.style.width = '100%';
-        particleContainer.style.height = '100%';
-        particleContainer.style.pointerEvents = 'none';
-        particleContainer.style.zIndex = '9';
-        particleContainer.style.overflow = 'hidden';
-        radioWidget.appendChild(particleContainer);
-
-        let lastParticleTime = 0;
-        radioWidget.addEventListener('mousemove', (e) => {
-            const now = Date.now();
-            if (now - lastParticleTime < 50) return; // Throttle particle generation
-            lastParticleTime = now;
-
-            const particle = document.createElement('span');
-            particle.className = 'music-particle';
-            const notes = ['♪', '♫', '♬', '♩'];
-            particle.textContent = notes[Math.floor(Math.random() * notes.length)];
-            
-            // Randomize color
-            const isPink = Math.random() > 0.5;
-            particle.style.color = isPink ? 'var(--pastel-pink)' : 'var(--soft-lilac)';
-            particle.style.textShadow = `0 0 8px ${isPink ? 'var(--pastel-pink)' : 'var(--soft-lilac)'}`;
-            
-            // Position based on widget
-            const rect = radioWidget.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            particle.style.left = `${x}px`;
-            particle.style.top = `${y}px`;
-            
-            particleContainer.appendChild(particle);
-            
-            // Cleanup particle
-            setTimeout(() => {
-                if (particle.parentNode) {
-                    particle.parentNode.removeChild(particle);
+            // 2. Cambiar los nodos estáticos y animados de la lava en el SVG
+            const ellipses = document.querySelectorAll('.gloops ellipse');
+            ellipses.forEach((el, index) => {
+                if (index < 3) {
+                    // Burbujas animadas
+                    el.setAttribute('fill', `rgb(${c.s})`);
+                    const anim = el.querySelector('animate[attributeName="fill"]');
+                    if (anim) anim.setAttribute('values', `rgb(${c.p}); rgb(${c.s}); rgb(${c.p})`);
+                } else if (index === 3) {
+                    // Gotita superior estática
+                    el.setAttribute('fill', `rgb(${c.p})`);
+                } else if (index === 4) {
+                    // Piscina base estática
+                    el.setAttribute('fill', `rgb(${c.b})`);
                 }
-            }, 1500);
+            });
         });
 
+        // --- SISTEMA ANTI-INSPECCIÓN ---
+        
+        // 1. Bloquear clic derecho (menú contextual)
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+
+        // 2. Bloquear atajos de teclado de herramientas de desarrollador
+        document.addEventListener('keydown', (e) => {
+            // Bloquear F12
+            if (e.key === 'F12') {
+                e.preventDefault();
+            }
+            // Bloquear Ctrl+Shift+I (Windows) / Cmd+Opt+I (Mac)
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'i')) {
+                e.preventDefault();
+            }
+            // Bloquear Ctrl+Shift+J (Windows) / Cmd+Opt+J (Mac)
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'J' || e.key === 'j')) {
+                e.preventDefault();
+            }
+            // Bloquear Ctrl+Shift+C (Windows) / Cmd+Opt+C (Mac)
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'C' || e.key === 'c')) {
+                e.preventDefault();
+            }
+            // Bloquear Ctrl+U / Cmd+U (Ver código fuente)
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'U' || e.key === 'u')) {
+                e.preventDefault();
+            }
+        });
     </script>
 </body>
 </html>
