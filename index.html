@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>FENIX | Renacimiento UI</title>
+    <title>Mae Xatspace</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -566,31 +566,55 @@
             .main-workspace { 
                 top: 45%; 
                 width: 95vw; 
-                padding: 20px; 
-                /* Garantiza que no exceda la vista del móvil y permite el scroll interior */
+                padding: 20px 20px 80px 20px; /* Padding inferior extra para scroll libre del dock */
                 max-height: calc(100dvh - 120px - env(safe-area-inset-bottom)); 
                 margin-top: 65px;
             }
-            .home-layout { flex-direction: column; align-items: center; gap: 30px; height: auto; min-height: 100%; justify-content: flex-start; }
-            .dashboard-widgets { flex-direction: column; gap: 20px; }
-            .time-display h1 { font-size: 3rem; }
+            .close-workspace { top: 15px; right: 15px; width: 35px; height: 35px; font-size: 1.5rem; }
+
+            .home-layout { flex-direction: column; align-items: center; gap: 20px; height: auto; min-height: 100%; justify-content: flex-start; }
+            
+            /* Avatar: reubicado sin absolute, centrado arriba */
+            .user-badge-home { 
+                position: relative; 
+                top: 0; left: 0; 
+                align-self: center; 
+                margin-bottom: 0;
+                padding: 4px 12px 4px 4px;
+            }
+            .user-badge-home img { width: 32px; height: 32px; }
+            .user-badge-home .user-name { font-size: 0.95rem; }
+
+            .dashboard-widgets { flex-direction: column; gap: 15px; width: 100%; }
+            .time-display { padding: 10px; }
+            .time-display h1 { font-size: clamp(2.8rem, 10vw, 4rem); }
             .time-display p { text-align: center; }
+            .time-sec { font-size: 0.3em; }
+            .time-ampm { font-size: 0.25em; }
+
             .yt-iframe-wrapper { height: 40vh; width: 100%; }
-            .carousel-wrapper { width: 260px; height: 260px; }
+
+            /* Galería: Más pequeña para no cortar botones */
+            .carousel-wrapper { width: 60vw; height: 60vw; max-width: 220px; max-height: 220px; }
+            .carousel-btn { width: 40px; height: 40px; font-size: 1.4rem; }
+            .prev-btn { left: -15px; }
+            .next-btn { right: -15px; }
+
             .fire-quote { font-size: clamp(0.9rem, 4vw, 1.2rem); }
             .fire-quote-sub { font-size: clamp(0.5rem, 2vw, 0.65rem); }
             .main-quote-container { width: 95%; bottom: calc(15px + env(safe-area-inset-bottom)); }
             
-            /* Responsive Reproductor Spotify Horizontal a Vertical */
+            /* Responsive Reproductor Spotify Horizontal a Vertical más compacto */
             .spotify-style-player {
                 display: flex;
                 flex-direction: column;
-                padding: 20px;
+                padding: 15px 20px;
                 max-width: 100%;
                 width: 100%;
-                gap: 12px;
-                transform: none; /* Quitamos el scale para evitar recortes raros en iOS */
-                margin-bottom: 20px;
+                gap: 10px;
+                transform: none; 
+                margin-bottom: 0;
+                box-sizing: border-box;
             }
             .sp-top-bar, .sp-cover-large, .sp-track-info-large, .sp-progress-area, .sp-controls-main, .sp-playlist {
                 grid-column: auto;
@@ -600,15 +624,23 @@
             }
             .sp-top-bar { text-align: center; }
             .sp-cover-large { 
-                margin: 0 auto 5px auto; 
-                max-width: 50vw; /* Evita que la caratula estire demasiado el reproductor */
+                margin: 0 auto; 
+                width: 140px; 
+                height: 140px;
+                max-width: 100%; 
                 aspect-ratio: 1/1;
             }
-            .sp-controls-main { justify-content: space-between; gap: 0; }
-            .sp-playlist { max-height: 140px; -webkit-overflow-scrolling: touch; } /* Aseguramos espacio */
+            .sp-track-text h3 { font-size: 1.2rem; }
+            .sp-track-text p { font-size: 0.85rem; }
+            .sp-like-btn { font-size: 1.4rem; }
+            .sp-controls-main { justify-content: space-around; gap: 0; }
+            .sp-controls-main i.ph-fill, .sp-controls-main i.ph-bold { font-size: 1.4rem; }
+            .sp-play-wrapper { width: 50px; height: 50px; }
+            .sp-play-wrapper i { font-size: 1.8rem !important; }
+            .sp-playlist { max-height: 120px; padding-top: 10px; -webkit-overflow-scrolling: touch; } 
+            .sp-track { padding: 8px; }
             
-            .user-badge-home { top: 15px; left: 15px; }
-            .music-layout { justify-content: flex-start; height: auto; min-height: 100%; }
+            .music-layout { justify-content: flex-start; height: auto; min-height: 100%; padding: 10px; }
         }
     </style>
 </head>
