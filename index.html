@@ -386,26 +386,35 @@
         
         .friends-grid {
             display: flex;
-            flex-wrap: wrap;
+            flex-wrap: nowrap; /* Forzado a una sola fila */
             justify-content: center;
-            gap: 45px;
+            gap: 25px; /* Reducido para que quepan todos */
             width: 100%;
             max-width: 850px;
             margin-top: 20px;
+            overflow-x: auto; /* Permite desplazamiento sutil si no caben en móvil */
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 10px; /* Evita cortes visuales con el glow inferior */
         }
+
+        /* Scrollbar sutil para la fila de amigos */
+        .friends-grid::-webkit-scrollbar { height: 4px; }
+        .friends-grid::-webkit-scrollbar-track { background: transparent; }
+        .friends-grid::-webkit-scrollbar-thumb { background: rgba(255, 42, 42, 0.3); border-radius: 4px; }
 
         .friend-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
+            gap: 10px; /* Reducido ligeramente */
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
+            flex-shrink: 0; /* Evita que los avatares se deformen o aplasten */
         }
 
         .friend-avatar {
-            width: 110px;
-            height: 110px;
+            width: 90px; /* Reducido de 110px proporcionalmente */
+            height: 90px;
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid rgba(255, 106, 0, 0.4);
@@ -416,7 +425,7 @@
         .friend-name {
             font-family: var(--font-title);
             color: var(--text-main);
-            font-size: 1.1rem;
+            font-size: 1rem; /* Reducido de 1.1rem */
             font-weight: 600;
             text-shadow: 0 0 8px rgba(255, 106, 0, 0.5);
             letter-spacing: 1px;
@@ -790,9 +799,13 @@
             .landing-btn { padding: 14px 40px; font-size: 1.1rem; }
 
             /* Responsive Vínculos (Amigos) */
-            .friends-grid { gap: 20px; }
-            .friend-avatar { width: 85px; height: 85px; }
-            .friend-name { font-size: 0.95rem; }
+            .friends-grid { 
+                gap: 15px; 
+                justify-content: flex-start; /* Permite scroll natural alineado a la izquierda en móvil */
+                padding-bottom: 15px; 
+            }
+            .friend-avatar { width: 70px; height: 70px; } /* Reducido para móvil */
+            .friend-name { font-size: 0.85rem; } /* Ajustado para móvil */
         }
     </style>
 </head>
@@ -878,14 +891,14 @@
         <!-- VISTA MÚSICA (REPRODUCTOR ESTILO SPOTIFY HORIZONTAL) -->
         <div id="music-view" class="view-container music-layout">
             <div class="spotify-style-player" id="spotify-widget">
-                <audio id="audio-player" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto"></audio>
+                <audio id="audio-player" src="track1.mp3" preload="auto"></audio>
                 
                 <div class="sp-top-bar">
                     <span>Reproduciendo Ritual</span>
                     <h5>Mix Fénix Oscuro</h5>
                 </div>
                 
-                <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop" class="sp-cover-large" alt="Cover" id="sp-cover-image">
+                <img src="cover1.jpg" class="sp-cover-large" alt="Cover" id="sp-cover-image">
                 
                 <div class="sp-track-info-large">
                     <div class="sp-track-text">
@@ -918,42 +931,42 @@
                 </div>
 
                 <div class="sp-playlist" id="sp-tracklist">
-                    <div class="sp-track active" data-title="No se vale llorar" data-artist="Alejandra Guzmán" data-src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" data-img="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop">
+                    <div class="sp-track active" data-title="No se vale llorar" data-artist="Alejandra Guzmán" data-src="track1.mp3" data-img="cover1.jpg">
                         <div class="sp-track-left">
                             <span class="sp-track-num">1</span>
                             <div class="sp-track-details">
                                 <h5>No se vale llorar</h5>
-                                <p>Alejandra Guzmán</p>
+                                <span>Alejandra Guzmán</span>
                             </div>
                         </div>
                         <i class="ph-bold ph-dots-three"></i>
                     </div>
-                    <div class="sp-track" data-title="I Will Always Love You" data-artist="Whitney Houston" data-src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" data-img="https://images.unsplash.com/photo-1504333638930-c8787321fea0?q=80&w=400&auto=format&fit=crop">
+                    <div class="sp-track" data-title="I Will Always Love You" data-artist="Whitney Houston" data-src="track2.mp3" data-img="cover2.jpg">
                         <div class="sp-track-left">
                             <span class="sp-track-num">2</span>
                             <div class="sp-track-details">
                                 <h5>I Will Always Love You</h5>
-                                <p>Whitney Houston</p>
+                                <span>Whitney Houston</span>
                             </div>
                         </div>
                         <i class="ph-bold ph-dots-three"></i>
                     </div>
-                    <div class="sp-track" data-title="I Love You" data-artist="Céline Dion" data-src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" data-img="https://images.unsplash.com/photo-1519074069444-1ba4fff66d16?q=80&w=400&auto=format&fit=crop">
+                    <div class="sp-track" data-title="I Love You" data-artist="Céline Dion" data-src="track3.mp3" data-img="cover3.jpg">
                         <div class="sp-track-left">
                             <span class="sp-track-num">3</span>
                             <div class="sp-track-details">
                                 <h5>I Love You</h5>
-                                <p>Céline Dion</p>
+                                <span>Céline Dion</span>
                             </div>
                         </div>
                         <i class="ph-bold ph-dots-three"></i>
                     </div>
-                    <div class="sp-track" data-title="No Puedo Vivir Sin Él" data-artist="KAROL G" data-src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" data-img="https://images.unsplash.com/photo-1633511116241-76b6b7aee295?q=80&w=400&auto=format&fit=crop">
+                    <div class="sp-track" data-title="No Puedo Vivir Sin Él" data-artist="KAROL G" data-src="track4.mp3" data-img="cover4.jpg">
                         <div class="sp-track-left">
                             <span class="sp-track-num">4</span>
                             <div class="sp-track-details">
                                 <h5>No Puedo Vivir Sin Él</h5>
-                                <p>KAROL G</p>
+                                <span>KAROL G</span>
                             </div>
                         </div>
                         <i class="ph-bold ph-dots-three"></i>
@@ -1010,12 +1023,8 @@
                     <img src="https://i.imgur.com/OHhwmOE.jpeg" alt="Eam" class="friend-avatar">
                     <span class="friend-name">Eam</span>
                 </div>
-            </div>
-        </div>
-
-             </div>
                 <div class="friend-item">
-                    <img src="https://i.imgur.com/OHhwmOE.jpeg" alt="Eam" class="friend-avatar">
+                    <img src="https://i.imgur.com/OHhwmOE.jpeg" alt="Tekila" class="friend-avatar">
                     <span class="friend-name">Tekila</span>
                 </div>
             </div>
