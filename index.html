@@ -1,282 +1,1211 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xat Lava Lamp</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>FENIX | Renacimiento UI</title>
     
-    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/eamxat/Images/refs/heads/main/favicon-16x16.png">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
     <style>
+        /* =========================================
+           VARIABLES Y PALETA DE COLORES FENIX
+           ========================================= */
         :root {
+            --black: #000000;
+            --dark-bg: #0a0202;
+            --red-fire: #ff2a2a;
+            --orange-intense: #ff6a00;
+            --yellow-warm: #ffb347;
             
-            --bg-color: #12121c;
-            --glow-c1: rgba(225, 66, 43, 0.65);
-            --glow-c2: rgba(225, 66, 43, 0.15);
-            --glow-c3: rgba(225, 66, 43, 0);
+            --text-main: #f0e4e5;
+            --text-muted: #9c8487;
+            
+            --font-title: 'Playfair Display', serif;
+            --font-body: 'Poppins', sans-serif;
+
+            /* Glassmorphism Oscuro Elegante Fenix */
+            --glass-bg: rgba(20, 5, 5, 0.4);
+            --glass-border: rgba(255, 42, 42, 0.4);
+            --glass-shadow: rgba(0, 0, 0, 0.8);
+            --glass-highlight: rgba(255, 106, 0, 0.3);
+        }
+
+        /* =========================================
+           RESETEO Y ESTILOS BASE
+           ========================================= */
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: var(--font-body); 
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Optimización táctil (Evita delay de 300ms en móviles) */
+        a, button, .dock-icon, .card, .calendar-day, .glass-button, .carousel-btn, .sp-controls i, .sp-progress-bar, .sp-track, .heart-photo, .close-workspace, .sp-play-wrapper, .sp-like-btn { 
+            touch-action: manipulation; 
+        }
+
+        /* Solo aplicamos cursor none en dispositivos con ratón (Desktop) */
+        @media (pointer: fine) {
+            * { cursor: none !important; }
+            a, button, .dock-icon, .card, .calendar-day, .glass-button, .carousel-btn, .sp-controls i, .sp-progress-bar, .sp-track, .heart-photo, .close-workspace { cursor: none !important; }
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: var(--bg-color); 
+            width: 100vw; 
+            min-height: 100vh; /* Fallback para navegadores antiguos */
+            height: 100dvh; /* Soporte para barras móviles dinámicas */
             overflow: hidden;
-            font-family: sans-serif;
-            transition: background-color 0.8s ease; 
-            -webkit-touch-callout: none; 
-            -webkit-user-select: none; 
-            user-select: none; 
+            background-color: var(--black); 
+            color: var(--text-main);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        .lamp-container {
-            height: 68vh; 
-            width: 100%;
-            max-width: 340px; 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative; 
+        /* CUSTOM SCROLLBAR */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--red-fire); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--orange-intense); }
+
+        /* =========================================
+           FONDOS: VIDEO Y PARTÍCULAS (PROTAGONISTAS)
+           ========================================= */
+        .video-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh; z-index: -3; overflow: hidden; }
+        .video-container video { width: 100%; height: 100%; object-fit: cover; transform: scale(1.05); }
+        .overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh; z-index: -2; background: radial-gradient(circle at center, rgba(255, 42, 42, 0.1) 0%, rgba(0, 0, 0, 0.6) 70%, var(--black) 100%); }
+        #particles-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh; z-index: -1; pointer-events: none; }
+
+        /* =========================================
+           GRADIENTE DE FUEGO INFERIOR (AMBIENTE)
+           ========================================= */
+        .bottom-fire-gradient {
+            position: fixed;
+            bottom: 0; left: 0;
+            width: 100vw; height: 35vh;
+            background: linear-gradient(to top, rgba(255, 42, 42, 0.35), rgba(255, 106, 0, 0.15), transparent);
+            z-index: -2;
+            pointer-events: none;
+            transform-origin: bottom;
+            animation: flameGradient 4s ease-in-out infinite alternate;
         }
 
- 
-        .lamp-container::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
+        @keyframes flameGradient {
+            0% { opacity: 0.5; transform: scaleY(0.9); }
+            50% { opacity: 0.9; transform: scaleY(1.1); }
+            100% { opacity: 0.6; transform: scaleY(1.0); }
+        }
+
+        /* =========================================
+           CURSOR PERSONALIZADO (FUEGO)
+           ========================================= */
+        .custom-cursor {
+            position: fixed; top: -100px; left: -100px;
+            width: 32px; height: 32px; border-radius: 50%;
+            pointer-events: none; z-index: 999999;
             transform: translate(-50%, -50%);
-            width: 80vw; 
-            height: 80vw; 
-            max-width: 700px; 
-            max-height: 700px;
-            background: radial-gradient(circle at center, var(--glow-c1) 0%, var(--glow-c2) 35%, var(--glow-c3) 70%);
-            filter: blur(60px); 
-            z-index: -1; 
-            border-radius: 50%;
-            pointer-events: none; 
-            transition: background 0.8s ease; 
+            background: radial-gradient(circle, rgba(255,106,0,0.5) 0%, transparent 70%);
+            border: 1px solid rgba(255,106,0,0.7);
+            box-shadow: 0 0 15px rgba(255,42,42,0.6), inset 0 0 10px rgba(255,106,0,0.4);
+            transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease-out;
+            mix-blend-mode: screen; will-change: left, top;
         }
-
-        .lamp {
-            height: 100%;
-            width: 100%;
-            overflow: visible; 
-        }
-
-
-        .site-logo-link {
-            position: absolute;
-            bottom: 25px;
-            right: 30px;
-            z-index: 10; 
-            display: inline-block;
-        }
-
         
-        .site-logo {
-            width: 65px; 
-            height: auto;
-            display: block;
-            transition: transform 0.3s ease; /
+        .custom-cursor.hover {
+            background: radial-gradient(circle, rgba(255,179,71,0.6) 0%, transparent 70%);
+            border-color: #fff; box-shadow: 0 0 25px var(--orange-intense), inset 0 0 15px rgba(255,255,255,0.7);
         }
 
-      
-        .site-logo-link:hover .site-logo {
-            transform: scale(1.08); 
+        .custom-cursor.click {
+            transform: translate(-50%, -50%) scale(0.8);
+            background: rgba(255, 255, 255, 0.9);
+            border-color: var(--yellow-warm);
+            box-shadow: 0 0 20px var(--red-fire);
         }
 
-       
-        .color-switch {
+        /* Ocultar el cursor personalizado en dispositivos táctiles para evitar bugs de hover en iOS/Android */
+        @media (pointer: coarse) {
+            .custom-cursor, .anime-sparkle { display: none !important; }
+        }
+
+        /* =========================================
+           TEXTO DE FUEGO CENTRAL (QUOTE)
+           ========================================= */
+        .main-quote-container {
             position: absolute;
-            bottom: 25px;
-            left: 30px;
-            width: 42px; 
-            height: 42px;
-            border-radius: 50%; 
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            background: rgba(255, 255, 255, 0.05);
-            cursor: pointer;
+            bottom: calc(25px + env(safe-area-inset-bottom)); /* Respeta Safe Area en iOS */
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            width: 90%; max-width: 900px;
             z-index: 10;
+            pointer-events: none;
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .main-quote-container.hidden {
+            opacity: 0;
+            transform: translate(-50%, 20px);
+        }
+
+        .fire-quote {
+            font-family: var(--font-title);
+            font-size: clamp(1rem, 2.5vw, 1.6rem);
+            font-weight: 600; line-height: 1.2;
+            letter-spacing: 1px; font-style: italic;
+            
+            background-image: linear-gradient(0deg, var(--red-fire) 0%, var(--orange-intense) 30%, var(--yellow-warm) 50%, var(--orange-intense) 70%, var(--red-fire) 100%);
+            background-size: 100% 200%;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: fireAnimText 3.5s linear infinite;
+            filter: drop-shadow(0px 4px 10px rgba(255, 42, 42, 0.8));
+        }
+
+        .fire-quote-sub {
+            font-family: var(--font-title);
+            font-size: clamp(0.55rem, 1.1vw, 0.75rem);
+            font-weight: 400; font-style: italic;
+            color: rgba(255, 179, 71, 0.95);
+            text-shadow: 0 0 8px rgba(255, 106, 0, 0.7);
+            letter-spacing: 0.5px;
+            white-space: nowrap; 
+        }
+
+        @keyframes fireAnimText {
+            0% { background-position: 0% 100%; }
+            100% { background-position: 0% 0%; }
+        }
+
+        /* =========================================
+           RENDER CENTRAL FLOTANTE
+           ========================================= */
+        .center-render-wrapper {
+            position: fixed;
+            bottom: calc(170px + env(safe-area-inset-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            width: 280px; 
+            z-index: 5; 
+            pointer-events: auto; 
             display: flex;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(5px);
+        }
+
+        .center-render-wrapper img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 0 15px rgba(255, 106, 0, 0.4)); 
             transition: all 0.3s ease;
         }
 
-        .color-switch:hover {
-            background: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3); 
-            transform: scale(1.08);
-            border-color: rgba(255, 255, 255, 0.3);
+        /* @media (hover: hover) asegura que los efectos hover solo apliquen en desktop */
+        @media (hover: hover) {
+            .center-render-wrapper:hover img {
+                animation: renderShineLoop 1.5s infinite ease-in-out;
+            }
         }
 
-        
-        .color-indicator {
-            width: 18px; 
-            height: 18px;
+        @keyframes renderShineLoop {
+            0% { filter: drop-shadow(0 0 15px rgba(255, 106, 0, 0.4)) brightness(1) contrast(1); }
+            50% { filter: drop-shadow(0 0 30px rgba(255, 42, 42, 0.8)) brightness(1.25) contrast(1.1); }
+            100% { filter: drop-shadow(0 0 15px rgba(255, 106, 0, 0.4)) brightness(1) contrast(1); }
+        }
+
+        /* =========================================
+           BARRA DE COLORES INFERIOR (DOCK)
+           ========================================= */
+        .bottom-dock {
+            position: fixed;
+            bottom: calc(90px + env(safe-area-inset-bottom)); /* Cross-browser safe areas */
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 15px 30px;
+            border-radius: 50px;
+            z-index: 100;
+            background: rgba(20, 5, 5, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 106, 0, 0.4);
+            border-top: 1px solid rgba(255, 179, 71, 0.4);
+            box-shadow: 0 15px 35px var(--glass-shadow), 0 0 25px rgba(255, 42, 42, 0.3), inset 0 0 15px rgba(255, 106, 0, 0.2);
+            transition: all 0.4s ease;
+        }
+
+        .bottom-dock.shifted {
+            bottom: calc(40px + env(safe-area-inset-bottom));
+        }
+
+        @media (hover: hover) {
+            .bottom-dock:hover { border-color: var(--yellow-warm); box-shadow: 0 15px 40px var(--glass-shadow), 0 0 35px rgba(255, 106, 0, 0.5); }
+        }
+
+        .dock-icon {
+            font-size: 26px; color: var(--yellow-warm);
+            width: 55px; height: 55px;
+            display: flex; justify-content: center; align-items: center;
             border-radius: 50%;
-            background-color: rgb(225, 66, 43); 
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); 
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            transition: background-color 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: rgba(255, 42, 42, 0.15);
+            border: 1px solid rgba(255, 106, 0, 0.3);
+            box-shadow: 0 0 15px rgba(255, 42, 42, 0.4), inset 0 0 10px rgba(255, 106, 0, 0.2);
+            position: relative;
+            text-shadow: 0 0 10px var(--yellow-warm);
         }
 
-        /* Responsivo para móviles */
-        @media (max-width: 768px) {
-            .site-logo-link {
-                bottom: 15px;
-                right: 20px;
+        .dock-icon:hover, .dock-icon.active {
+            background: rgba(255, 60, 0, 0.8);
+            border-color: var(--yellow-warm);
+            color: #fff;
+            transform: translateY(-10px) scale(1.15);
+            box-shadow: 0 10px 30px var(--red-fire), 0 0 40px var(--orange-intense), inset 0 0 20px var(--yellow-warm);
+            text-shadow: 0 0 10px #fff;
+        }
+
+        .dock-icon.active::after {
+            content: ''; position: absolute; bottom: -12px; left: 50%;
+            transform: translateX(-50%); width: 6px; height: 6px;
+            border-radius: 50%; background: var(--yellow-warm);
+            box-shadow: 0 0 10px var(--yellow-warm);
+        }
+
+        /* =========================================
+           TARJETA PRINCIPAL OCULTA (MODAL WORKSPACE)
+           ========================================= */
+        .glass-panel {
+            background: var(--glass-bg); 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border); border-top: 1px solid var(--glass-highlight); border-left: 1px solid var(--glass-highlight);
+            box-shadow: 0 30px 60px var(--glass-shadow), inset 0 0 20px rgba(255, 42, 42, 0.1);
+            border-radius: 32px; transition: border-color 0.4s ease;
+        }
+
+        .glass-inner {
+            background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 42, 42, 0.2); border-radius: 20px;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.6), 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .main-workspace {
+            position: fixed;
+            top: 45%; left: 50%;
+            transform: translate(-50%, -45%) scale(0.95);
+            width: 92vw; max-width: 1200px; 
+            height: 82vh; height: 82dvh;
+            padding: 40px;
+            z-index: 50;
+            opacity: 0; visibility: hidden; pointer-events: none;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
+            overflow-x: hidden;
+            margin-top: 65px;
+            -webkit-overflow-scrolling: touch; /* Inercia fluida de scroll en Safari iOS */
+        }
+
+        .main-workspace.open {
+            opacity: 1; visibility: visible; pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .close-workspace {
+            position: absolute; top: 25px; right: 25px;
+            font-size: 2rem; color: var(--text-muted);
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.05); transition: all 0.3s; z-index: 100;
+        }
+        @media (hover: hover) {
+            .close-workspace:hover { color: #fff; background: var(--red-fire); transform: rotate(90deg); box-shadow: 0 0 15px var(--red-fire); }
+        }
+
+        /* =========================================
+           CONTENIDO DEL WORKSPACE
+           ========================================= */
+        .home-layout { position: relative; display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; flex-wrap: wrap; gap: 40px; }
+        .youtube-layout, .instagram-layout, .music-layout { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 20px; padding: 10px 40px; height: 100%; }
+
+        .view-container { display: none; width: 100%; height: 100%; animation: fadeInView 0.5s ease; }
+        .view-container.active { display: flex; }
+        @keyframes fadeInView { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Left Widgets (HOME ONLY: Reloj + Calendario) */
+        .dashboard-widgets { display: flex; justify-content: center; align-items: center; gap: 50px; flex-wrap: wrap; width: 100%; }
+        
+        .time-display { text-align: center; padding: 20px; border-radius: 20px; }
+        
+        /* Reloj Místico Gradiente */
+        .time-display h1 { 
+            font-size: 5.5rem; font-weight: 300; line-height: 1; font-family: var(--font-title); 
+            font-style: italic; letter-spacing: 4px;
+            background: linear-gradient(to right, var(--yellow-warm), var(--red-fire), var(--orange-intense), var(--yellow-warm)); 
+            background-size: 200% auto;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+            animation: mysticalClock 4s linear infinite;
+            filter: drop-shadow(0px 0px 15px rgba(255, 60, 0, 0.8));
+        }
+        @keyframes mysticalClock { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+        
+        .time-display p { font-size: 0.75rem; font-weight: 400; color: var(--yellow-warm); margin-top: 5px; text-transform: uppercase; opacity: 0.6; letter-spacing: 2px; }
+
+        .time-sec { font-size: 0.35em; letter-spacing: 1px; margin-left: 4px; font-weight: 400; }
+        .time-ampm { font-size: 0.25em; letter-spacing: 2px; margin-left: 6px; font-weight: 500; vertical-align: baseline; opacity: 0.9; }
+
+        /* Calendar */
+        .calendar-widget { padding: 20px; padding-bottom: 25px; width: 100%; max-width: 350px; }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 1.2rem; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--glass-border); color: var(--yellow-warm); font-family: var(--font-title); }
+        .cal-nav-btn { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
+        @media (hover: hover) { .cal-nav-btn:hover { background: var(--orange-intense); color: #000; transform: scale(1.1); box-shadow: 0 0 10px var(--orange-intense); } }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; font-size: 0.8rem; transform: scale(0.90); transform-origin: top center; }
+        .calendar-day-name { font-weight: 600; color: var(--orange-intense); margin-bottom: 3px; }
+        .calendar-day { width: 25px; height: 25px; display: flex; justify-content: center; align-items: center; border-radius: 8px; transition: all 0.3s ease; }
+        @media (hover: hover) { .calendar-day:hover { background: rgba(255, 106, 0, 0.2); transform: scale(1.1); } }
+        .calendar-day.active { background: var(--red-fire); color: #fff; font-weight: bold; box-shadow: 0 0 15px var(--red-fire); }
+
+        /* =========================================
+           REPRODUCTOR DE MÚSICA SPOTIFY (HORIZONTAL)
+           ========================================= */
+        .music-layout { justify-content: center; align-items: center; }
+        
+        .spotify-style-player {
+            background: linear-gradient(180deg, rgba(30, 5, 5, 0.7) 0%, rgba(10, 2, 2, 0.85) 100%);
+            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 106, 0, 0.15); border-top: 1px solid rgba(255, 179, 71, 0.2);
+            border-radius: 20px; padding: 35px; width: 100%; max-width: 850px; 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(255, 42, 42, 0.05);
+            
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            grid-template-rows: auto auto auto auto 1fr;
+            column-gap: 40px;
+            row-gap: 15px;
+            align-items: center;
+            
+            transform: scale(0.92);
+            margin-bottom: 30px;
+        }
+        
+        .sp-top-bar { grid-column: 2; grid-row: 1; text-align: left; color: var(--text-muted); }
+        .sp-top-bar span { display: block; font-size: 0.65rem; font-weight: 600; letter-spacing: 1.5px; opacity: 0.8; margin-bottom: 2px; text-transform: uppercase;}
+        .sp-top-bar h5 { color: var(--text-main); margin: 0; font-size: 0.85rem; font-weight: 600; }
+        
+        .sp-cover-large { grid-column: 1; grid-row: 1 / 6; width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 12px; box-shadow: 0 15px 35px rgba(255, 42, 42, 0.25); margin-bottom: 0; transition: opacity 0.3s; align-self: center; }
+        
+        .sp-track-info-large { grid-column: 2; grid-row: 2; display: flex; justify-content: space-between; align-items: center; }
+        .sp-track-text h3 { font-size: 1.4rem; font-weight: 700; color: #fff; margin: 0 0 4px 0; letter-spacing: 0.5px; }
+        .sp-track-text p { font-size: 0.95rem; color: rgba(255, 179, 71, 0.9); margin: 0; }
+        .sp-like-btn { font-size: 1.6rem; color: var(--text-muted); transition: all 0.3s; position: relative; }
+        @media (hover: hover) { .sp-like-btn:hover { color: var(--red-fire); filter: drop-shadow(0 0 8px var(--red-fire)); transform: scale(1.1); } }
+        
+        .sp-progress-area { grid-column: 2; grid-row: 3; width: 100%; display: flex; flex-direction: column; gap: 8px; margin-top: 5px; }
+        .sp-progress-container { width: 100%; height: 4px; background: rgba(255, 255, 255, 0.15); border-radius: 2px; position: relative; }
+        .sp-progress-fill { height: 100%; width: 0%; background: var(--text-main); border-radius: 2px; position: relative; transition: width 0.1s linear; }
+        @media (hover: hover) { .spotify-style-player:hover .sp-progress-fill { background: linear-gradient(90deg, var(--red-fire), var(--yellow-warm)); box-shadow: 0 0 10px rgba(255,106,0,0.5); } }
+        .sp-progress-dot { position: absolute; right: -6px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; background: #fff; border-radius: 50%; opacity: 0; transition: opacity 0.2s; box-shadow: 0 0 10px var(--orange-intense); }
+        .sp-progress-container:hover .sp-progress-dot, .sp-progress-container:active .sp-progress-dot { opacity: 1; }
+        .sp-time-flex { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); font-weight: 500; letter-spacing: 0.5px; }
+        
+        .sp-controls-main { grid-column: 2; grid-row: 4; display: flex; justify-content: flex-start; align-items: center; width: 100%; margin-top: 5px; gap: 30px; }
+        .sp-controls-main i.ph-fill, .sp-controls-main i.ph-bold { font-size: 1.6rem; color: var(--text-main); opacity: 0.7; transition: all 0.2s; }
+        @media (hover: hover) { .sp-controls-main i.ph-fill:hover, .sp-controls-main i.ph-bold:hover { opacity: 1; filter: drop-shadow(0 0 8px rgba(255,255,255,0.5)); transform: scale(1.1); } }
+        
+        .sp-play-wrapper { width: 64px; height: 64px; border-radius: 50%; background: var(--text-main); display: flex; justify-content: center; align-items: center; transition: all 0.3s; box-shadow: 0 0 20px rgba(255, 255, 255, 0.15); }
+        @media (hover: hover) { .sp-play-wrapper:hover { transform: scale(1.08); background: linear-gradient(135deg, var(--yellow-warm), var(--orange-intense)); box-shadow: 0 0 25px var(--orange-intense); } }
+        .sp-play-wrapper i { font-size: 2.2rem !important; color: var(--black) !important; opacity: 1 !important; margin-left: 4px; }
+        .sp-play-wrapper.playing i { margin-left: 0; } 
+        
+        .sp-playlist { grid-column: 2; grid-row: 5; margin-top: 5px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 15px; display: flex; flex-direction: column; gap: 5px; max-height: 150px; overflow-y: auto; padding-right: 5px; align-self: start; -webkit-overflow-scrolling: touch; }
+        .sp-playlist::-webkit-scrollbar { width: 4px; }
+        .sp-track { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-radius: 8px; transition: background 0.2s; }
+        @media (hover: hover) { .sp-track:hover { background: rgba(255,255,255,0.06); } }
+        .sp-track-left { display: flex; align-items: center; gap: 15px; }
+        .sp-track-num { font-size: 0.9rem; color: var(--text-muted); width: 15px; text-align: right; font-weight: 500; }
+        .sp-track-details h5 { font-size: 0.95rem; color: var(--text-main); margin: 0 0 3px 0; font-weight: 500; }
+        .sp-track-details p { font-size: 0.8rem; color: var(--text-muted); margin: 0; }
+        .sp-track.active .sp-track-num { color: var(--orange-intense); display: none; }
+        .sp-track.active .sp-track-left::before { content: '\25B6'; font-size: 0.8rem; color: var(--orange-intense); width: 15px; text-align: right; text-shadow: 0 0 8px rgba(255, 106, 0, 0.6); }
+        .sp-track.active .sp-track-details h5 { color: var(--orange-intense); text-shadow: 0 0 8px rgba(255, 106, 0, 0.4); }
+
+        /* =========================================
+           COMPONENTES INTERNOS (YOUTUBE / IG)
+           ========================================= */
+        .yt-iframe-wrapper { width: 90%; height: 75%; border-radius: 24px; overflow: hidden; box-shadow: 0 15px 35px var(--glass-shadow); border: 1px solid var(--orange-intense); background: rgba(0,0,0,0.5); }
+        .yt-iframe-wrapper iframe { width: 100%; height: 100%; border: none; }
+
+        /* Carrusel Fénix Circular con Fade */
+        .instagram-gallery-wrapper { width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .carousel-wrapper { position: relative; width: 320px; height: 320px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 10px; box-shadow: 0 0 40px rgba(255, 42, 42, 0.3); border: 2px solid transparent; margin: 0 auto; }
+        .carousel-wrapper::after { content: ''; position: absolute; top: -5px; left: -5px; right: -5px; bottom: -5px; border-radius: 50%; border: 2px solid transparent; background: linear-gradient(45deg, var(--red-fire), var(--orange-intense), transparent, var(--yellow-warm)) border-box; -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0); -webkit-mask-composite: destination-out; mask-composite: exclude; animation: spin 8s linear infinite; pointer-events: none; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .carousel-track-container { width: 100%; height: 100%; overflow: hidden; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
+        .carousel-track { padding: 0; margin: 0; list-style: none; display: flex; width: 100%; height: 100%; }
+        .carousel-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 1s ease-in-out; display: flex; justify-content: center; align-items: center; }
+        .carousel-slide.active { opacity: 1; z-index: 2; }
+        .carousel-slide img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; cursor: zoom-in; border: 1px solid rgba(255,255,255,0.1); }
+        .carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(20, 5, 5, 0.8); border: 1px solid var(--orange-intense); color: var(--yellow-warm); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; transition: all 0.3s; z-index: 10;}
+        @media (hover: hover) { .carousel-btn:hover { background: var(--orange-intense); color: #fff; box-shadow: 0 0 20px var(--orange-intense); transform: translateY(-50%) scale(1.1); } }
+        .prev-btn { left: -30px; } .next-btn { right: -30px; }
+
+        /* Lightbox Zoom */
+        .lightbox-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px); z-index: 99999; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        .lightbox-overlay.active { opacity: 1; visibility: visible; }
+        .lightbox-content { position: relative; display: flex; justify-content: center; align-items: center; }
+        .lightbox-overlay img { max-width: 90vw; max-height: 85vh; object-fit: contain; border-radius: 16px; box-shadow: 0 0 40px var(--red-fire); transform: scale(0.8); transition: transform 0.4s ease; border: 1px solid var(--glass-border);}
+        .lightbox-overlay.active img { transform: scale(1); }
+        .lightbox-close { position: absolute; top: -50px; right: 0; font-size: 2.5rem; color: #fff; cursor: pointer; transition: all 0.3s; }
+        @media (hover: hover) { .lightbox-close:hover { color: var(--orange-intense); transform: scale(1.1) rotate(90deg); text-shadow: 0 0 10px var(--orange-intense);} }
+
+        /* Partículas del Cursor (Chispas de fuego reales) */
+        .anime-sparkle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            border-radius: 50%;
+            background: radial-gradient(circle, #fff 0%, var(--yellow-warm) 30%, var(--orange-intense) 60%, var(--red-fire) 100%);
+            filter: blur(1px) drop-shadow(0 0 6px var(--orange-intense));
+            animation: fireTrailAnim 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+        @keyframes fireTrailAnim {
+            0% { opacity: 1; transform: scale(1) translateY(0) translateX(0); }
+            100% { opacity: 0; transform: scale(0.2) translateY(-40px) translateX(calc(20px - 40px * var(--dirX))); }
+        }
+
+        /* =========================================
+           NUEVOS AJUSTES: AVATAR Y LIKES
+           ========================================= */
+        /* Avatar + User en Home */
+        .user-badge-home {
+            position: absolute;
+            top: 25px;
+            left: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 6px 15px 6px 6px;
+            border-radius: 30px;
+            z-index: 10;
+        }
+        .user-badge-home img {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--orange-intense);
+            box-shadow: 0 0 10px rgba(255,106,0,0.5);
+        }
+        .user-badge-home .user-name {
+            font-family: var(--font-title);
+            font-size: 1.1rem;
+            font-weight: 700;
+            background-image: linear-gradient(0deg, var(--red-fire) 0%, var(--orange-intense) 30%, var(--yellow-warm) 50%, var(--orange-intense) 70%, var(--red-fire) 100%);
+            background-size: 100% 200%;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: fireAnimText 3.5s linear infinite;
+        }
+
+        /* Control activo y Like Burst Animation */
+        .sp-controls-main i.active-control {
+            color: var(--orange-intense) !important;
+            filter: drop-shadow(0 0 8px var(--orange-intense)) !important;
+            opacity: 1 !important;
+        }
+
+        .sp-like-btn.active {
+            color: var(--red-fire);
+            filter: drop-shadow(0 0 8px var(--red-fire));
+        }
+
+        .heart-burst {
+            position: fixed;
+            pointer-events: none;
+            z-index: 100000;
+            color: var(--red-fire);
+            font-size: 1.5rem;
+            filter: drop-shadow(0 0 8px var(--red-fire));
+            animation: burstAnim 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+        @keyframes burstAnim {
+            0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
+            100% { transform: translate(var(--tx), -80px) scale(1.5); opacity: 0; }
+        }
+
+        /* =========================================
+           RESPONSIVE DESIGN (CROSS-BROWSER MOBILE)
+           ========================================= */
+        @media screen and (max-width: 1024px) {
+            .main-workspace { width: 95vw; height: 85vh; height: 85dvh; }
+            .fire-quote { font-size: 3rem; }
+            .dashboard-widgets { flex-direction: column; gap: 20px; }
+        }
+        @media screen and (max-width: 768px) {
+            .center-render-wrapper { width: 180px; bottom: calc(160px + env(safe-area-inset-bottom)); }
+            .bottom-dock { width: 90vw; justify-content: space-around; padding: 15px 20px; bottom: calc(80px + env(safe-area-inset-bottom)); gap: 10px;}
+            .bottom-dock.shifted { bottom: calc(25px + env(safe-area-inset-bottom)); } 
+            .dock-icon { width: 45px; height: 45px; font-size: 20px; }
+            
+            /* Responsive Main Workspace Mobile */
+            .main-workspace { 
+                top: 45%; 
+                width: 95vw; 
+                padding: 20px; 
+                /* Garantiza que no exceda la vista del móvil y permite el scroll interior */
+                max-height: calc(100dvh - 120px - env(safe-area-inset-bottom)); 
+                margin-top: 65px;
             }
-            .site-logo {
-                width: 50px;
+            .home-layout { flex-direction: column; align-items: center; gap: 30px; height: auto; min-height: 100%; justify-content: flex-start; }
+            .dashboard-widgets { flex-direction: column; gap: 20px; }
+            .time-display h1 { font-size: 3rem; }
+            .time-display p { text-align: center; }
+            .yt-iframe-wrapper { height: 40vh; width: 100%; }
+            .carousel-wrapper { width: 260px; height: 260px; }
+            .fire-quote { font-size: clamp(0.9rem, 4vw, 1.2rem); }
+            .fire-quote-sub { font-size: clamp(0.5rem, 2vw, 0.65rem); }
+            .main-quote-container { width: 95%; bottom: calc(15px + env(safe-area-inset-bottom)); }
+            
+            /* Responsive Reproductor Spotify Horizontal a Vertical */
+            .spotify-style-player {
+                display: flex;
+                flex-direction: column;
+                padding: 20px;
+                max-width: 100%;
+                width: 100%;
+                gap: 12px;
+                transform: none; /* Quitamos el scale para evitar recortes raros en iOS */
+                margin-bottom: 20px;
             }
-            .color-switch {
-                bottom: 15px;
-                left: 20px;
-                width: 36px;
-                height: 36px;
+            .sp-top-bar, .sp-cover-large, .sp-track-info-large, .sp-progress-area, .sp-controls-main, .sp-playlist {
+                grid-column: auto;
+                grid-row: auto;
+                align-self: auto;
+                margin: 0;
             }
-            .color-indicator {
-                width: 15px;
-                height: 15px;
+            .sp-top-bar { text-align: center; }
+            .sp-cover-large { 
+                margin: 0 auto 5px auto; 
+                max-width: 50vw; /* Evita que la caratula estire demasiado el reproductor */
+                aspect-ratio: 1/1;
             }
+            .sp-controls-main { justify-content: space-between; gap: 0; }
+            .sp-playlist { max-height: 140px; -webkit-overflow-scrolling: touch; } /* Aseguramos espacio */
+            
+            .user-badge-home { top: 15px; left: 15px; }
+            .music-layout { justify-content: flex-start; height: auto; min-height: 100%; }
         }
     </style>
 </head>
 <body>
 
+    <!-- CURSOR PERSONALIZADO JS -->
+    <div class="custom-cursor" id="custom-cursor"></div>
+
+    <!-- FONDOS: VIDEO Y PARTÍCULAS CANVAS -->
+    <div class="video-container">
+        <video autoplay loop muted playsinline>
+            <source src="https://i.imgur.com/4TGseQq.mp4" type="video/mp4">
+        </video>
+    </div>
+    <div class="overlay"></div>
+    <canvas id="particles-canvas"></canvas>
     
-    <button class="color-switch" id="colorBtn" title="Cambiar color">
-        <span class="color-indicator" id="colorIndicator"></span>
-    </button>
+    <!-- GRADIENTE DE FUEGO INFERIOR -->
+    <div class="bottom-fire-gradient"></div>
 
-    
-    <a href="https://xat.com" target="_blank" class="site-logo-link" title="Ir a xat.com">
-        <img src="https://raw.githubusercontent.com/eamxat/Images/7af4ec4622f89c3c332964539fc5991e7a6050bd/xatlogo%20text2.svg" alt="Logo" class="site-logo">
-    </a>
-
-    <div class="lamp-container">
-        <svg class="lamp" viewBox="-21 0 100 125">
-            <defs>
-                
-                <filter id="goo">
-                    <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"></feGaussianBlur>
-                    <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -8" result="color-matrix-filter"></feColorMatrix>
-                    <feComposite in="SourceGraphic" in2="color-matrix-filter" operator="atop"></feComposite>
-                </filter>
-                <linearGradient id="glass" gradientTransform="rotate(0)">
-                    <stop offset="15%"  stop-color="rgba(255,255,255,0)" />
-                    <stop offset="95%" stop-color="rgba(255,255,255,0.3)" />
-                </linearGradient>
-                <linearGradient id="dark-blue-base" gradientTransform="rotate(0)">
-                    <stop offset="15%"  stop-color="#0b0f19" />
-                    <stop offset="95%" stop-color="#1c2640" />
-                </linearGradient>
-                
-                
-                <radialGradient id="floor-shadow" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stop-color="rgba(0, 0, 0, 0.8)" />
-                    <stop offset="100%" stop-color="rgba(0, 0, 0, 0)" />
-                </radialGradient>
-            </defs>
-            <g class="gloops" filter="url(#goo)">
-                <ellipse rx="10%" ry="10%" class="circle" fill="rgb(205,46,43)">
-                    <animate attributeName="cx" values="28%; 33%; 28%" dur="12s" repeatCount="indefinite" />
-                    <animate attributeName="cy" values="16%; 69%; 16%" dur="12.2s" repeatCount="indefinite" keyTimes="0;0.6;1" />
-                    <animate attributeName="rx" values="7%; 4%; 7%" dur="10.4s" begin="-1" repeatCount="indefinite" />
-                    <animate attributeName="ry" values="7%; 4%; 7%" dur="19.4s" begin="-3" repeatCount="indefinite" />
-                    <animate attributeName="fill" values="rgb(225,66,43); rgb(205,46,43); rgb(225,66,43)" dur="10s" begin="-1" repeatCount="indefinite" />
-                </ellipse>
-                <ellipse r="10%" class="circle" fill="rgb(205,46,43)">
-                    <animate attributeName="cx" values="28%; 33%; 28%" dur="11.2s" begin="-12" repeatCount="indefinite" />
-                    <animate attributeName="cy" values="16%; 69%; 16%" dur="14.1s" begin="-4" repeatCount="indefinite" keyTimes="0;0.6;1" />
-                    <animate attributeName="rx" values="7%; 4%; 7%" dur="9.4s" begin="-5" repeatCount="indefinite" />
-                    <animate attributeName="ry" values="7%; 4%; 7%" dur="10.4s" begin="-3" repeatCount="indefinite" />
-                    <animate attributeName="fill" values="rgb(225,66,43); rgb(205,46,43); rgb(225,66,43)" dur="10s" begin="-1" repeatCount="indefinite" />
-                </ellipse>
-                <ellipse r="10%" class="circle" fill="rgb(205,46,43)">
-                    <animate attributeName="cx" values="28%; 33%; 28%" dur="11.7s" begin="-6" repeatCount="indefinite" />
-                    <animate attributeName="cy" values="16%; 69%; 16%" dur="16.4s" begin="-9" repeatCount="indefinite" keyTimes="0;0.6;1" />
-                    <animate attributeName="rx" values="7%; 4%; 7%" dur="7.4s" begin="-4" repeatCount="indefinite" />
-                    <animate attributeName="ry" values="7%; 4%; 7%" dur="13.4s" begin="-5" repeatCount="indefinite" />
-                    <animate attributeName="fill" values="rgb(225,66,43); rgb(205,46,43); rgb(225,66,43)" dur="10s" begin="-1" repeatCount="indefinite" />
-                </ellipse>
-                <ellipse cx="30" cy="18" rx="7" ry="4" fill="rgb(225,66,43)" />
-                <ellipse cx="30" cy="87" rx="15" ry="10" fill="rgb(225,46,43)" />
-            </g>
-            
-            <ellipse cx="30" cy="119" rx="40" ry="4.5" fill="url(#floor-shadow)" />
-
-            <path fill="url(#dark-blue-base)" d="M 25 1 L 21 19 Q 30 21 39 19 L 35 1 Q 30 0 25 1" stroke="#0b0f19" stroke-width=".5" />
-            <path fill="url(#dark-blue-base)" d="M 12 83 L 19 100 Q 30 102 41 100 L 48 83 Q 30 88 12 83" stroke="#0b0f19" stroke-width=".5" />
-            
-            <path fill="url(#dark-blue-base)" d="M 19 100 L 8 119 L 52 119 L 41 100 Q 30 102 19 100z" stroke="#0b0f19" stroke-width=".5" />
-            
-            <path fill="url(#glass)" d="M 21 19 C 19 29 6 68 9 75 L 12 83 Q 30 88 48 83 L 51 75 C 54 68 41 29 39 19 Q 30 21 21 19" stroke="#ccc" stroke-width=".3" />
-        </svg>
+    <!-- RENDER CENTRAL FLOTANTE -->
+    <div class="center-render-wrapper">
+        <img src="https://i.imgur.com/JwWDLlI.png" alt="Fenix Render">
     </div>
 
+    <!-- FRASE INICIAL (PROTAGONISTA) -->
+    <div class="main-quote-container" id="main-quote">
+        <h1 class="fire-quote">"En el mapa de mi alma tu huella sigue marcada,"</h1>
+        <p class="fire-quote-sub">un amor que no se borra. Un Recuerdo que aun late</p>
+    </div>
+
+    <!-- BARRA DE COLORES INFERIOR (DOCK) -->
+    <nav class="bottom-dock" id="bottom-dock">
+        <div class="dock-icon" id="dock-home" title="Inicio"><i class="ph ph-house"></i></div>
+        <div class="dock-icon" id="dock-music" title="Música"><i class="ph ph-music-notes"></i></div>
+        <div class="dock-icon" id="dock-youtube" title="Rituales Visuales"><i class="ph ph-youtube-logo"></i></div>
+        <div class="dock-icon" id="dock-instagram" title="Visiones"><i class="ph ph-images"></i></div>
+    </nav>
+
+    <!-- TARJETA PRINCIPAL OCULTA (MODAL WORKSPACE) -->
+    <section class="main-workspace glass-panel" id="main-workspace">
+        <div class="close-workspace" id="close-workspace-btn" title="Cerrar"><i class="ph ph-x"></i></div>
+
+        <!-- VISTA HOME (LIMPIA: Reloj y Calendario Separados) -->
+        <div id="home-view" class="view-container home-layout">
+            
+            <!-- Avatar Usuario Esquina -->
+            <div class="user-badge-home glass-inner">
+                <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=100&auto=format&fit=crop" alt="Avatar">
+                <span class="user-name">Maee (9007)</span>
+            </div>
+
+            <div class="dashboard-widgets">
+                <div class="time-display" id="time-display">
+                    <h1 id="clock">00:00</h1>
+                    <p id="date-display">Lunes<br>01 de Enero</p>
+                </div>
+                
+                <div class="calendar-widget glass-inner" id="calendar-widget-container">
+                    <div class="calendar-header">
+                        <i class="ph ph-caret-left cal-nav-btn" id="prev-month"></i>
+                        <span id="calendar-month">Mes Año</span>
+                        <i class="ph ph-caret-right cal-nav-btn" id="next-month"></i>
+                    </div>
+                    <div class="calendar-grid">
+                        <div class="calendar-day-name">D</div><div class="calendar-day-name">L</div><div class="calendar-day-name">M</div><div class="calendar-day-name">M</div><div class="calendar-day-name">J</div><div class="calendar-day-name">V</div><div class="calendar-day-name">S</div>
+                        <div id="calendar-days" style="display: contents;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISTA MÚSICA (REPRODUCTOR ESTILO SPOTIFY HORIZONTAL) -->
+        <div id="music-view" class="view-container music-layout">
+            <div class="spotify-style-player" id="spotify-widget">
+                <audio id="audio-player" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto"></audio>
+                
+                <div class="sp-top-bar">
+                    <span>Reproduciendo Ritual</span>
+                    <h5>Mix Fénix Oscuro</h5>
+                </div>
+                
+                <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop" class="sp-cover-large" alt="Cover" id="sp-cover-image">
+                
+                <div class="sp-track-info-large">
+                    <div class="sp-track-text">
+                        <h3 id="sp-current-title">Llamas del Destino</h3>
+                        <p id="sp-current-artist">Ritual Oscuro / Ambient</p>
+                    </div>
+                    <i class="ph-fill ph-heart sp-like-btn"></i>
+                </div>
+                
+                <div class="sp-progress-area">
+                    <div class="sp-progress-container" id="sp-progress-container">
+                        <div class="sp-progress-fill" id="sp-progress-fill">
+                            <div class="sp-progress-dot"></div>
+                        </div>
+                    </div>
+                    <div class="sp-time-flex">
+                        <span class="sp-time-current" id="sp-current-time">0:00</span>
+                        <span class="sp-time-total" id="sp-total-time">0:00</span>
+                    </div>
+                </div>
+                
+                <div class="sp-controls-main">
+                    <i class="ph-bold ph-shuffle" id="sp-shuffle-btn"></i>
+                    <i class="ph-fill ph-skip-back" id="sp-prev-btn"></i>
+                    <div class="sp-play-wrapper" id="sp-play-pause-btn">
+                        <i class="ph-fill ph-play" id="sp-play-icon"></i>
+                    </div>
+                    <i class="ph-fill ph-skip-forward" id="sp-next-btn"></i>
+                    <i class="ph-bold ph-repeat" id="sp-repeat-btn"></i>
+                </div>
+
+                <div class="sp-playlist" id="sp-tracklist">
+                    <div class="sp-track active" data-title="Llamas del Destino" data-artist="Ritual Oscuro / Ambient" data-src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" data-img="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop">
+                        <div class="sp-track-left">
+                            <span class="sp-track-num">1</span>
+                            <div class="sp-track-details">
+                                <h5>Llamas del Destino</h5>
+                                <p>Ritual Oscuro</p>
+                            </div>
+                        </div>
+                        <i class="ph-bold ph-dots-three"></i>
+                    </div>
+                    <div class="sp-track" data-title="Ecos de Ceniza" data-artist="Chillwave" data-src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" data-img="https://images.unsplash.com/photo-1504333638930-c8787321fea0?q=80&w=400&auto=format&fit=crop">
+                        <div class="sp-track-left">
+                            <span class="sp-track-num">2</span>
+                            <div class="sp-track-details">
+                                <h5>Ecos de Ceniza</h5>
+                                <p>Chillwave</p>
+                            </div>
+                        </div>
+                        <i class="ph-bold ph-dots-three"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISTA YOUTUBE -->
+        <div id="youtube-view" class="view-container youtube-layout">
+            <div class="yt-iframe-wrapper">
+                <iframe src="https://www.youtube.com/embed/jfKfPfyJRdk" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+
+        <!-- VISTA GALERÍA (Circular con Fade) -->
+        <div id="instagram-view" class="view-container instagram-layout">
+            <div class="instagram-gallery-wrapper">
+                <div class="carousel-wrapper">
+                    <button class="carousel-btn prev-btn" id="ig-prev"><i class="ph ph-caret-left"></i></button>
+                    <div class="carousel-track-container">
+                        <ul class="carousel-track" id="ig-track">
+                            <li class="carousel-slide active"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop" alt="Galeria 1"></li>
+                            <li class="carousel-slide"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=600&auto=format&fit=crop" alt="Galeria 2"></li>
+                            <li class="carousel-slide"><img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=600&auto=format&fit=crop" alt="Galeria 3"></li>
+                        </ul>
+                    </div>
+                    <button class="carousel-btn next-btn" id="ig-next"><i class="ph ph-caret-right"></i></button>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- Lightbox -->
+    <div id="image-lightbox" class="lightbox-overlay">
+        <div class="lightbox-content">
+            <i class="ph ph-x lightbox-close" id="lightbox-close-btn"></i>
+            <img id="lightbox-img" src="" alt="Zoom">
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
     <script>
-        const colors = [
-            { bg: '#12121c', p: '225,66,43',  s: '205,46,43',  b: '225,46,43' },  // Rojo (Original)
-            { bg: '#0b1a12', p: '43,225,120', s: '34,180,90',  b: '43,200,100' }, // Verde
-            { bg: '#0b141a', p: '43,150,225', s: '34,120,200', b: '43,130,210' }, // Azul
-            { bg: '#170b1a', p: '160,43,225', s: '130,34,200', b: '150,43,210' }, // Morado
-            { bg: '#1a180b', p: '225,200,43', s: '200,170,34',  b: '225,180,43' }  // Amarillo
-        ];
-        
-        let colorIdx = 0;
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- 0. LÓGICA DEL CURSOR PERSONALIZADO (Evitando problemas en pantallas táctiles) ---
+            const cursor = document.getElementById('custom-cursor');
+            let mouseX = window.innerWidth / 2;
+            let mouseY = window.innerHeight / 2;
 
-        document.getElementById('colorBtn').addEventListener('click', () => {
-            colorIdx = (colorIdx + 1) % colors.length;
-            const c = colors[colorIdx];
+            // Media query de Javascript para evitar que se ejecute logica en moviles innecesariamente
+            const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
 
-            document.documentElement.style.setProperty('--bg-color', c.bg);
-            document.documentElement.style.setProperty('--glow-c1', `rgba(${c.p}, 0.65)`);
-            document.documentElement.style.setProperty('--glow-c2', `rgba(${c.p}, 0.15)`);
-            document.documentElement.style.setProperty('--glow-c3', `rgba(${c.p}, 0)`);
+            if (!isTouchDevice) {
+                document.addEventListener('mousemove', (e) => {
+                    mouseX = e.clientX;
+                    mouseY = e.clientY;
+                });
 
-            document.getElementById('colorIndicator').style.backgroundColor = `rgb(${c.p})`;
+                function renderCursor() {
+                    cursor.style.left = mouseX + 'px';
+                    cursor.style.top = mouseY + 'px';
+                    requestAnimationFrame(renderCursor);
+                }
+                requestAnimationFrame(renderCursor);
 
-            const ellipses = document.querySelectorAll('.gloops ellipse');
-            ellipses.forEach((el, index) => {
-                if (index < 3) {
-                    el.setAttribute('fill', `rgb(${c.s})`);
-                    const anim = el.querySelector('animate[attributeName="fill"]');
-                    if (anim) anim.setAttribute('values', `rgb(${c.p}); rgb(${c.s}); rgb(${c.p})`);
-                } else if (index === 3) {
-                    el.setAttribute('fill', `rgb(${c.p})`);
-                } else if (index === 4) {
-                    el.setAttribute('fill', `rgb(${c.b})`);
+                document.addEventListener('mousedown', () => cursor.classList.add('click'));
+                document.addEventListener('mouseup', () => cursor.classList.remove('click'));
+
+                const interactives = document.querySelectorAll('a, button, .dock-icon, .card, .calendar-day, .glass-button, .carousel-btn, .sp-controls i, .sp-progress-bar, .sp-track, .heart-photo, .close-workspace, img, .center-render-wrapper');
+                interactives.forEach(el => {
+                    el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+                    el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+                });
+            }
+
+            // --- 1. LÓGICA DE APERTURA DEL WORKSPACE (MODAL) ---
+            const mainWorkspace = document.getElementById('main-workspace');
+            const mainQuote = document.getElementById('main-quote');
+            const closeWorkspaceBtn = document.getElementById('close-workspace-btn');
+            const dockIcons = document.querySelectorAll('.dock-icon'); 
+            const bottomDock = document.getElementById('bottom-dock');
+            const views = {
+                home: document.getElementById('home-view'),
+                music: document.getElementById('music-view'),
+                youtube: document.getElementById('youtube-view'),
+                instagram: document.getElementById('instagram-view')
+            };
+
+            function openWorkspace(viewId) {
+                mainQuote.classList.add('hidden');
+                mainWorkspace.classList.add('open');
+                bottomDock.classList.add('shifted');
+                dockIcons.forEach(icon => icon.classList.remove('active'));
+                Object.values(views).forEach(v => v?.classList.remove('active'));
+                views[viewId]?.classList.add('active');
+                document.getElementById('dock-' + viewId)?.classList.add('active');
+            }
+
+            function closeWorkspace() {
+                mainWorkspace.classList.remove('open');
+                mainQuote.classList.remove('hidden');
+                bottomDock.classList.remove('shifted');
+                dockIcons.forEach(icon => icon.classList.remove('active'));
+                const particlesBox = document.getElementById('particles-container');
+                if(particlesBox) particlesBox.innerHTML = '';
+            }
+
+            // Eventos de Navegación del Dock
+            document.getElementById('dock-home').addEventListener('click', () => openWorkspace('home'));
+            document.getElementById('dock-music').addEventListener('click', () => openWorkspace('music'));
+            document.getElementById('dock-youtube').addEventListener('click', () => openWorkspace('youtube'));
+            document.getElementById('dock-instagram').addEventListener('click', () => openWorkspace('instagram'));
+            
+            // Botón de Cerrar Workspace
+            if (closeWorkspaceBtn) {
+                closeWorkspaceBtn.addEventListener('click', closeWorkspace);
+            }
+
+            // --- 2. FUNCIONES DEL REPRODUCTOR DE MÚSICA SPOTIFY (FULL CONTROLS) ---
+            const audioPlayer = document.getElementById('audio-player');
+            const playPauseWrapper = document.getElementById('sp-play-pause-btn');
+            const playIcon = document.getElementById('sp-play-icon');
+            const progressFill = document.getElementById('sp-progress-fill');
+            const progressContainer = document.getElementById('sp-progress-container');
+            const currentTimeEl = document.getElementById('sp-current-time');
+            const totalTimeEl = document.getElementById('sp-total-time');
+            const currentTitle = document.getElementById('sp-current-title');
+            const currentArtist = document.getElementById('sp-current-artist');
+            const coverImage = document.getElementById('sp-cover-image');
+            
+            const spTracksNodes = document.querySelectorAll('.sp-track');
+            const spTracks = Array.from(spTracksNodes);
+            
+            const shuffleBtn = document.getElementById('sp-shuffle-btn');
+            const prevBtn = document.getElementById('sp-prev-btn');
+            const nextBtn = document.getElementById('sp-next-btn');
+            const repeatBtn = document.getElementById('sp-repeat-btn');
+            
+            let isShuffle = false;
+            let isRepeat = false;
+            let currentTrackIndex = 0;
+            
+            function formatTime(seconds) {
+                if (isNaN(seconds)) return "0:00";
+                const m = Math.floor(seconds / 60);
+                const s = Math.floor(seconds % 60);
+                return m + ":" + (s < 10 ? "0" : "") + s;
+            }
+
+            function togglePlay() {
+                if(audioPlayer.paused) {
+                    audioPlayer.play();
+                    playIcon.classList.replace('ph-play', 'ph-pause');
+                    playPauseWrapper.classList.add('playing');
+                } else {
+                    audioPlayer.pause();
+                    playIcon.classList.replace('ph-pause', 'ph-play');
+                    playPauseWrapper.classList.remove('playing');
+                }
+            }
+            
+            function loadAndPlayTrack(index) {
+                currentTrackIndex = index;
+                spTracks.forEach(t => t.classList.remove('active'));
+                const track = spTracks[index];
+                track.classList.add('active');
+                
+                if(currentTitle) currentTitle.textContent = track.getAttribute('data-title');
+                if(currentArtist) currentArtist.textContent = track.getAttribute('data-artist');
+                if(coverImage && track.getAttribute('data-img')) coverImage.src = track.getAttribute('data-img');
+                
+                audioPlayer.src = track.getAttribute('data-src');
+                audioPlayer.play();
+                playIcon.classList.replace('ph-play', 'ph-pause');
+                playPauseWrapper.classList.add('playing');
+            }
+
+            // Reproducir/Pausa
+            playPauseWrapper?.addEventListener('click', togglePlay);
+            
+            // Siguiente y Anterior
+            nextBtn?.addEventListener('click', () => {
+                let nextIndex = currentTrackIndex;
+                if (isShuffle) {
+                    while(nextIndex === currentTrackIndex && spTracks.length > 1) {
+                        nextIndex = Math.floor(Math.random() * spTracks.length);
+                    }
+                } else {
+                    nextIndex = (currentTrackIndex + 1) % spTracks.length;
+                }
+                loadAndPlayTrack(nextIndex);
+            });
+
+            prevBtn?.addEventListener('click', () => {
+                let prevIndex = currentTrackIndex;
+                if (isShuffle) {
+                    while(prevIndex === currentTrackIndex && spTracks.length > 1) {
+                        prevIndex = Math.floor(Math.random() * spTracks.length);
+                    }
+                } else {
+                    prevIndex = (currentTrackIndex - 1 + spTracks.length) % spTracks.length;
+                }
+                loadAndPlayTrack(prevIndex);
+            });
+
+            // Aleatorio y Repetir
+            shuffleBtn?.addEventListener('click', () => {
+                isShuffle = !isShuffle;
+                shuffleBtn.classList.toggle('active-control', isShuffle);
+            });
+
+            repeatBtn?.addEventListener('click', () => {
+                isRepeat = !isRepeat;
+                repeatBtn.classList.toggle('active-control', isRepeat);
+            });
+
+            // Progreso y tiempo
+            audioPlayer.addEventListener('timeupdate', () => {
+                if(audioPlayer.duration) {
+                    const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+                    if(progressFill) progressFill.style.width = `${progress}%`;
+                    currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
+                    totalTimeEl.textContent = formatTime(audioPlayer.duration);
                 }
             });
-        });
 
-        
-        document.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-        });
+            audioPlayer.addEventListener('loadedmetadata', () => {
+                totalTimeEl.textContent = formatTime(audioPlayer.duration);
+            });
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'F12') {
-                e.preventDefault();
+            audioPlayer.addEventListener('ended', () => {
+                if (isRepeat) {
+                    audioPlayer.currentTime = 0;
+                    audioPlayer.play();
+                } else {
+                    nextBtn.click();
+                }
+            });
+
+            // Adelantar progreso haciendo click
+            if (progressContainer) {
+                progressContainer.addEventListener('click', (e) => {
+                    const width = progressContainer.clientWidth;
+                    const clickX = e.offsetX;
+                    const duration = audioPlayer.duration;
+                    if (duration) {
+                        audioPlayer.currentTime = (clickX / width) * duration;
+                    }
+                });
             }
-            if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'i')) {
-                e.preventDefault();
+
+            // Seleccionar track desde la playlist
+            spTracks.forEach((track, index) => {
+                track.addEventListener('click', function() {
+                    loadAndPlayTrack(index);
+                });
+            });
+
+            // Animación de Like Burst (Corazones disparados)
+            const likeBtn = document.querySelector('.sp-like-btn');
+            if(likeBtn) {
+                likeBtn.addEventListener('click', function(e) {
+                    this.classList.toggle('active');
+                    
+                    if (this.classList.contains('active')) {
+                        const rect = this.getBoundingClientRect();
+                        for(let i = 0; i < 6; i++) {
+                            const heart = document.createElement('i');
+                            heart.className = 'ph-fill ph-heart heart-burst';
+                            // Dispersión sutil
+                            heart.style.left = (rect.left + rect.width / 2 - 12) + 'px';
+                            heart.style.top = (rect.top + rect.height / 2 - 12) + 'px';
+                            heart.style.setProperty('--tx', (Math.random() * 60 - 30) + 'px');
+                            heart.style.animationDuration = (0.6 + Math.random() * 0.4) + 's';
+                            document.body.appendChild(heart);
+                            
+                            setTimeout(() => heart.remove(), 1000);
+                        }
+                    }
+                });
             }
-            if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'J' || e.key === 'j')) {
-                e.preventDefault();
+
+            // --- 3. PARTÍCULAS CANVAS (Fuego orgánico y Cenizas) ---
+            const canvas = document.getElementById('particles-canvas');
+            const ctx = canvas.getContext('2d');
+            let width, height, particles = [];
+
+            function resizeCanvas() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
+            window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+            class AshParticle {
+                constructor() { this.reset(); this.y = Math.random() * height; }
+                reset() {
+                    this.x = Math.random() * width; 
+                    this.y = height + Math.random() * 100;
+                    this.size = Math.random() * 3.5 + 0.5; // Tamaños pequeños y medianos
+                    this.speedY = Math.random() * 2.0 + 0.5; // Velocidades distintas
+                    this.speedX = (Math.random() - 0.5) * 2; // Ligera dispersión lateral
+                    this.opacity = Math.random() * 0.9 + 0.1; // Opacidades distintas
+                    this.drift = Math.random() * 0.02; // Variación de dispersión
+                    this.blur = Math.random() > 0.5 ? Math.random() * 5 : 0; // Blur leve para profundidad
+                    
+                    // Colores cálidos (Fénix): Naranjas, rojos, amarillos y ocasional gris oscuro
+                    const colors = ['255, 42, 42', '255, 106, 0', '255, 179, 71', '220, 80, 20'];
+                    this.color = colors[Math.floor(Math.random() * colors.length)];
+                }
+                update() {
+                    this.y -= this.speedY; 
+                    this.x += this.speedX + Math.sin(this.y * this.drift) * 1.2; // Ascendente y ondulatorio suave
+                    this.opacity -= 0.0015;
+                    if (this.y < -10 || this.opacity <= 0) this.reset();
+                }
+                draw() {
+                    ctx.beginPath(); 
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${this.color}, ${this.opacity})`; 
+                    
+                    // Glow + Blur de profundidad nativo del canvas
+                    ctx.shadowBlur = this.blur + 6; 
+                    ctx.shadowColor = `rgba(${this.color}, 0.8)`; 
+                    ctx.fill();
+                }
             }
-            if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'C' || e.key === 'c')) {
-                e.preventDefault();
+
+            // Incremento sustancial en la cantidad de partículas
+            for (let i = 0; i < Math.floor(window.innerWidth / 6); i++) particles.push(new AshParticle());
+            
+            function animateAshParticles() {
+                ctx.clearRect(0, 0, width, height);
+                particles.forEach(p => { p.update(); p.draw(); });
+                requestAnimationFrame(animateAshParticles);
             }
-            if ((e.ctrlKey || e.metaKey) && (e.key === 'U' || e.key === 'u')) {
-                e.preventDefault();
+            animateAshParticles();
+
+            // --- 4. RELOJ Y CALENDARIO ---
+            const clockElement = document.getElementById('clock');
+            const dateElement = document.getElementById('date-display');
+            const daysEs = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            const monthsEs = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+            function updateTime() {
+                const now = new Date();
+                
+                // Configuración explícita requerida para toLocaleTimeString
+                const timeString = now.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                });
+                
+                // Separamos la hora y el AM/PM. El formato de 'en-US' devuelve ej: "06:14:32 PM"
+                const match = timeString.match(/(\d+):(\d+):(\d+)\s*(AM|PM)/i);
+                
+                if (match && clockElement) {
+                    const hStr = match[1].padStart(2, '0');
+                    const m = match[2];
+                    const s = match[3];
+                    const ampm = match[4];
+                    
+                    clockElement.innerHTML = `${hStr}:${m}<span class="time-sec">:${s}</span> <span class="time-ampm">${ampm}</span>`;
+                }
+
+                if (dateElement) dateElement.innerHTML = `${daysEs[now.getDay()]}<br>${now.getDate()} de ${monthsEs[now.getMonth()]}`;
             }
+            
+            // Actualización dinámica y precisa en tiempo real cada 1 segundo
+            setInterval(updateTime, 1000); 
+            updateTime();
+
+            const calendarDaysContainer = document.getElementById('calendar-days');
+            const calendarMonthElement = document.getElementById('calendar-month');
+            let currentNavDate = new Date();
+
+            function generateCalendar() {
+                const currentMonth = currentNavDate.getMonth(), currentYear = currentNavDate.getFullYear();
+                const realNow = new Date(), isCurrent = realNow.getMonth() === currentMonth && realNow.getFullYear() === currentYear;
+                if (calendarMonthElement) calendarMonthElement.textContent = `${monthsEs[currentMonth]} ${currentYear}`;
+                if (calendarDaysContainer) calendarDaysContainer.innerHTML = '';
+                const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+                const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+                for (let i = 0; i < firstDay; i++) calendarDaysContainer.appendChild(document.createElement('div'));
+                for (let i = 1; i <= daysInMonth; i++) {
+                    const dayDiv = document.createElement('div');
+                    dayDiv.classList.add('calendar-day'); dayDiv.textContent = i;
+                    if (isCurrent && i === realNow.getDate()) dayDiv.classList.add('active');
+                    dayDiv.addEventListener('click', function() { document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('active')); this.classList.add('active'); });
+                    calendarDaysContainer.appendChild(dayDiv);
+                }
+            }
+            document.getElementById('prev-month')?.addEventListener('click', () => { currentNavDate.setMonth(currentNavDate.getMonth() - 1); generateCalendar(); });
+            document.getElementById('next-month')?.addEventListener('click', () => { currentNavDate.setMonth(currentNavDate.getMonth() + 1); generateCalendar(); });
+            generateCalendar();
+
+            // --- 5. CHISPAS MÁGICAS EN EL CURSOR ---
+            if (!isTouchDevice) {
+                let lastDrawTime = 0;
+                document.addEventListener('mousemove', (e) => {
+                    const now = Date.now();
+                    if (now - lastDrawTime < 30) return; lastDrawTime = now;
+                    const sparkle = document.createElement('div');
+                    sparkle.className = 'anime-sparkle';
+                    sparkle.style.left = (e.clientX - 5) + 'px'; 
+                    sparkle.style.top = (e.clientY - 5) + 'px';
+                    const size = Math.random() * 8 + 6;
+                    sparkle.style.width = size + 'px';
+                    sparkle.style.height = size + 'px';
+                    sparkle.style.setProperty('--dirX', Math.random());
+                    document.body.appendChild(sparkle);
+                    setTimeout(() => sparkle.remove(), 600);
+                });
+            }
+
+            // --- 6. GALERÍA CIRCULAR CON FADE Y LIGHTBOX ---
+            const track = document.getElementById('ig-track');
+            if (track) {
+                const slides = Array.from(track.children);
+                let currentIndex = 0;
+                
+                const updateSlide = () => {
+                    slides.forEach(slide => slide.classList.remove('active'));
+                    slides[currentIndex].classList.add('active');
+                };
+                
+                document.getElementById('ig-next')?.addEventListener('click', () => { currentIndex = (currentIndex === slides.length - 1) ? 0 : currentIndex + 1; updateSlide(); });
+                document.getElementById('ig-prev')?.addEventListener('click', () => { currentIndex = (currentIndex === 0) ? slides.length - 1 : currentIndex - 1; updateSlide(); });
+            }
+
+            const lightbox = document.getElementById('image-lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            document.querySelectorAll('.carousel-slide img').forEach(img => { img.addEventListener('click', () => { lightboxImg.src = img.src; lightbox.classList.add('active'); }); });
+            const closeLB = () => lightbox.classList.remove('active');
+            document.getElementById('lightbox-close-btn')?.addEventListener('click', closeLB);
+            lightbox?.addEventListener('click', (e) => { if(e.target === lightbox) closeLB(); });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLB(); });
+
+            // --- Protección básica contra inspección y copia ---
+            
+            // 1. Bloquear clic derecho (menú contextual)
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+            });
+
+            // 2. Bloquear combinaciones de teclas específicas
+            document.addEventListener('keydown', function(e) {
+                // Bloquear F12
+                if (e.key === 'F12' || e.keyCode === 123) {
+                    e.preventDefault();
+                    return false;
+                }
+                
+                // Bloquear Ctrl + Shift + I (y Ctrl + Shift + J por seguridad extra)
+                if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.keyCode === 73 || e.key === 'J' || e.key === 'j' || e.keyCode === 74)) {
+                    e.preventDefault();
+                    return false;
+                }
+                
+                // Bloquear Ctrl + U (Ver código fuente)
+                if (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.keyCode === 85)) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+
         });
     </script>
 </body>
