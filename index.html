@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Mae Xatspace</title>
+    <title>FENIX | Renacimiento UI</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -50,14 +50,14 @@
         }
 
         /* Optimización táctil (Evita delay de 300ms en móviles) */
-        a, button, .dock-icon, .card, .calendar-day, .glass-button, .carousel-btn, .sp-controls i, .sp-progress-bar, .sp-track, .heart-photo, .close-workspace, .sp-play-wrapper, .sp-like-btn { 
+        a, button, .dock-icon, .card, .calendar-day, .glass-button, .carousel-btn, .sp-controls i, .sp-progress-bar, .sp-track, .heart-photo, .close-workspace, .sp-play-wrapper, .sp-like-btn, .friend-item { 
             touch-action: manipulation; 
         }
 
         /* Solo aplicamos cursor none en dispositivos con ratón (Desktop) */
         @media (pointer: fine) {
             * { cursor: none !important; }
-            a, button, .dock-icon, .card, .calendar-day, .glass-button, .carousel-btn, .sp-controls i, .sp-progress-bar, .sp-track, .heart-photo, .close-workspace { cursor: none !important; }
+            a, button, .dock-icon, .card, .calendar-day, .glass-button, .carousel-btn, .sp-controls i, .sp-progress-bar, .sp-track, .heart-photo, .close-workspace, .friend-item { cursor: none !important; }
         }
 
         body {
@@ -93,7 +93,7 @@
             bottom: 0; left: 0;
             width: 100vw; height: 35vh;
             background: linear-gradient(to top, rgba(255, 42, 42, 0.35), rgba(255, 106, 0, 0.15), transparent);
-            z-index: -2;
+            z-index: -2; /* Justo por encima del video y overlay, pero debajo del contenido */
             pointer-events: none;
             transform-origin: bottom;
             animation: flameGradient 4s ease-in-out infinite alternate;
@@ -112,7 +112,7 @@
             position: fixed; top: -100px; left: -100px;
             width: 32px; height: 32px; border-radius: 50%;
             pointer-events: none; z-index: 999999;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%); /* Centrado exacto */
             background: radial-gradient(circle, rgba(255,106,0,0.5) 0%, transparent 70%);
             border: 1px solid rgba(255,106,0,0.7);
             box-shadow: 0 0 15px rgba(255,42,42,0.6), inset 0 0 10px rgba(255,106,0,0.4);
@@ -177,12 +177,12 @@
 
         .fire-quote-sub {
             font-family: var(--font-title);
-            font-size: clamp(0.55rem, 1.1vw, 0.75rem);
+            font-size: clamp(0.55rem, 1.1vw, 0.75rem); /* Texto inferior miniatura */
             font-weight: 400; font-style: italic;
             color: rgba(255, 179, 71, 0.95);
             text-shadow: 0 0 8px rgba(255, 106, 0, 0.7);
             letter-spacing: 0.5px;
-            white-space: nowrap; 
+            white-space: nowrap; /* Fuerza estrictamente que quede en una sola línea */
         }
 
         @keyframes fireAnimText {
@@ -195,12 +195,12 @@
            ========================================= */
         .center-render-wrapper {
             position: fixed;
-            bottom: calc(170px + env(safe-area-inset-bottom));
+            bottom: calc(170px + env(safe-area-inset-bottom)); /* Sobre la barra de botones */
             left: 50%;
             transform: translateX(-50%);
-            width: 280px; 
-            z-index: 5; 
-            pointer-events: auto; 
+            width: 280px; /* Buen tamaño para PC */
+            z-index: 5; /* Detrás del panel modal si se abre */
+            pointer-events: auto; /* Permite detectar el hover */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -210,7 +210,7 @@
             width: 100%;
             height: auto;
             object-fit: contain;
-            filter: drop-shadow(0 0 15px rgba(255, 106, 0, 0.4)); 
+            filter: drop-shadow(0 0 15px rgba(255, 106, 0, 0.4)); /* Glow sutil naranja */
             transition: all 0.3s ease;
         }
 
@@ -251,7 +251,7 @@
         }
 
         .bottom-dock.shifted {
-            bottom: calc(40px + env(safe-area-inset-bottom));
+            bottom: calc(40px + env(safe-area-inset-bottom)); /* Desplazamiento dinámico hacia abajo para evitar superposiciones con el main-workspace */
         }
 
         @media (hover: hover) {
@@ -340,7 +340,7 @@
            CONTENIDO DEL WORKSPACE
            ========================================= */
         .home-layout { position: relative; display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; flex-wrap: wrap; gap: 40px; }
-        .youtube-layout, .instagram-layout, .music-layout { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 20px; padding: 10px 40px; height: 100%; }
+        .youtube-layout, .instagram-layout, .music-layout, .friends-layout { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 20px; padding: 10px 40px; height: 100%; }
 
         .view-container { display: none; width: 100%; height: 100%; animation: fadeInView 0.5s ease; }
         .view-container.active { display: flex; }
@@ -378,6 +378,70 @@
         .calendar-day { width: 25px; height: 25px; display: flex; justify-content: center; align-items: center; border-radius: 8px; transition: all 0.3s ease; }
         @media (hover: hover) { .calendar-day:hover { background: rgba(255, 106, 0, 0.2); transform: scale(1.1); } }
         .calendar-day.active { background: var(--red-fire); color: #fff; font-weight: bold; box-shadow: 0 0 15px var(--red-fire); }
+
+        /* =========================================
+           NUEVA SECCIÓN: AMIGOS (VÍNCULOS ETERNOS)
+           ========================================= */
+        .friends-layout { justify-content: center; }
+        
+        .friends-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 45px;
+            width: 100%;
+            max-width: 850px;
+            margin-top: 20px;
+        }
+
+        .friend-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .friend-avatar {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 106, 0, 0.4);
+            box-shadow: 0 0 15px rgba(255, 42, 42, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .friend-name {
+            font-family: var(--font-title);
+            color: var(--text-main);
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-shadow: 0 0 8px rgba(255, 106, 0, 0.5);
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        @media (hover: hover) {
+            .friend-item:hover {
+                transform: translateY(-5px);
+            }
+            .friend-item:hover .friend-avatar {
+                transform: scale(1.1);
+                border-color: var(--yellow-warm);
+                box-shadow: 0 0 25px rgba(255, 106, 0, 0.8), inset 0 0 10px rgba(255, 179, 71, 0.5);
+            }
+            .friend-item:hover .friend-name {
+                color: var(--yellow-warm);
+                text-shadow: 0 0 15px var(--yellow-warm);
+                transform: scale(1.05);
+            }
+        }
+
+        .friend-item:active {
+            transform: scale(0.95);
+        }
 
         /* =========================================
            REPRODUCTOR DE MÚSICA SPOTIFY (HORIZONTAL)
@@ -446,6 +510,8 @@
         /* =========================================
            COMPONENTES INTERNOS (YOUTUBE / IG)
            ========================================= */
+        .yt-header { width: 90%; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; position: relative;}
+        .yt-header h2 { font-size: 1.8rem; color: #fff; font-weight: 700; font-family: var(--font-title); text-shadow: 0 0 10px var(--red-fire); text-transform: uppercase; letter-spacing: 2px;}
         .yt-iframe-wrapper { width: 90%; height: 75%; border-radius: 24px; overflow: hidden; box-shadow: 0 15px 35px var(--glass-shadow); border: 1px solid var(--orange-intense); background: rgba(0,0,0,0.5); }
         .yt-iframe-wrapper iframe { width: 100%; height: 100%; border: none; }
 
@@ -485,6 +551,83 @@
         @keyframes fireTrailAnim {
             0% { opacity: 1; transform: scale(1) translateY(0) translateX(0); }
             100% { opacity: 0; transform: scale(0.2) translateY(-40px) translateX(calc(20px - 40px * var(--dirX))); }
+        }
+
+        /* =========================================
+           PANTALLA DE INICIO (LANDING PORTAL)
+           ========================================= */
+        #landing-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; 
+            height: 100vh; height: 100dvh;
+            background: rgba(10, 2, 2, 0.65); 
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            z-index: 999998; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.6s ease-in-out, backdrop-filter 0.6s ease-in-out;
+        }
+
+        #landing-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+            backdrop-filter: blur(0px);
+            -webkit-backdrop-filter: blur(0px);
+        }
+
+        .landing-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 45px;
+            margin-top: -8vh; 
+        }
+
+        .landing-avatar {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 106, 0, 0.5);
+            box-shadow: 0 0 25px rgba(255, 42, 42, 0.5);
+            animation: landingFloat 3.5s ease-in-out infinite;
+        }
+
+        @keyframes landingFloat {
+            0%, 100% { transform: translateY(0); box-shadow: 0 0 25px rgba(255, 42, 42, 0.5); }
+            50% { transform: translateY(-12px); box-shadow: 0 0 40px rgba(255, 106, 0, 0.8), inset 0 0 15px rgba(255, 179, 71, 0.4); }
+        }
+
+        .landing-btn {
+            background: rgba(20, 5, 5, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 106, 0, 0.5);
+            padding: 16px 50px;
+            border-radius: 40px;
+            color: var(--yellow-warm);
+            font-family: var(--font-title);
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            box-shadow: 0 0 20px rgba(255, 42, 42, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        @media (hover: hover) {
+            .landing-btn:hover {
+                background: linear-gradient(135deg, rgba(255, 42, 42, 0.8), rgba(255, 106, 0, 0.8));
+                color: #fff;
+                border-color: var(--yellow-warm);
+                box-shadow: 0 0 35px var(--orange-intense), inset 0 0 15px var(--yellow-warm);
+                transform: scale(1.05);
+                text-shadow: 0 0 10px #fff;
+            }
         }
 
         /* =========================================
@@ -566,7 +709,7 @@
             .main-workspace { 
                 top: 45%; 
                 width: 95vw; 
-                padding: 20px 20px 80px 20px; /* Padding inferior extra para scroll libre del dock */
+                padding: 20px 20px 80px 20px; 
                 max-height: calc(100dvh - 120px - env(safe-area-inset-bottom)); 
                 margin-top: 65px;
             }
@@ -641,10 +784,27 @@
             .sp-track { padding: 8px; }
             
             .music-layout { justify-content: flex-start; height: auto; min-height: 100%; padding: 10px; }
+
+            /* Responsive Landing Screen */
+            .landing-avatar { width: 130px; height: 130px; }
+            .landing-btn { padding: 14px 40px; font-size: 1.1rem; }
+
+            /* Responsive Vínculos (Amigos) */
+            .friends-grid { gap: 20px; }
+            .friend-avatar { width: 85px; height: 85px; }
+            .friend-name { font-size: 0.95rem; }
         }
     </style>
 </head>
 <body>
+
+    <!-- PANTALLA DE INICIO (PORTAL) -->
+    <div id="landing-screen">
+        <div class="landing-content">
+            <img src="https://i.imgur.com/ojLdyi5.png" alt="Avatar Portal" class="landing-avatar">
+            <button id="landing-enter-btn" class="landing-btn">Ingresar</button>
+        </div>
+    </div>
 
     <!-- CURSOR PERSONALIZADO JS -->
     <div class="custom-cursor" id="custom-cursor"></div>
@@ -678,6 +838,8 @@
         <div class="dock-icon" id="dock-music" title="Música"><i class="ph ph-music-notes"></i></div>
         <div class="dock-icon" id="dock-youtube" title="Rituales Visuales"><i class="ph ph-youtube-logo"></i></div>
         <div class="dock-icon" id="dock-instagram" title="Visiones"><i class="ph ph-images"></i></div>
+        <!-- NUEVO BOTÓN: AMIGOS -->
+        <div class="dock-icon" id="dock-friends" title="Vínculos Eternos"><i class="ph ph-users"></i></div>
     </nav>
 
     <!-- TARJETA PRINCIPAL OCULTA (MODAL WORKSPACE) -->
@@ -689,7 +851,7 @@
             
             <!-- Avatar Usuario Esquina -->
             <div class="user-badge-home glass-inner">
-                <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=100&auto=format&fit=crop" alt="Avatar">
+                <img src="https://i.imgur.com/ojLdyi5.png" alt="Avatar">
                 <span class="user-name">Maee (9007)</span>
             </div>
 
@@ -727,8 +889,8 @@
                 
                 <div class="sp-track-info-large">
                     <div class="sp-track-text">
-                        <h3 id="sp-current-title">Llamas del Destino</h3>
-                        <p id="sp-current-artist">Ritual Oscuro / Ambient</p>
+                        <h3 id="sp-current-title">No se vale llorar</h3>
+                        <p id="sp-current-artist">Alejandra Guzmán</p>
                     </div>
                     <i class="ph-fill ph-heart sp-like-btn"></i>
                 </div>
@@ -756,22 +918,42 @@
                 </div>
 
                 <div class="sp-playlist" id="sp-tracklist">
-                    <div class="sp-track active" data-title="Llamas del Destino" data-artist="Ritual Oscuro / Ambient" data-src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" data-img="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop">
+                    <div class="sp-track active" data-title="No se vale llorar" data-artist="Alejandra Guzmán" data-src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" data-img="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop">
                         <div class="sp-track-left">
                             <span class="sp-track-num">1</span>
                             <div class="sp-track-details">
-                                <h5>Llamas del Destino</h5>
-                                <p>Ritual Oscuro</p>
+                                <h5>No se vale llorar</h5>
+                                <p>Alejandra Guzmán</p>
                             </div>
                         </div>
                         <i class="ph-bold ph-dots-three"></i>
                     </div>
-                    <div class="sp-track" data-title="Ecos de Ceniza" data-artist="Chillwave" data-src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" data-img="https://images.unsplash.com/photo-1504333638930-c8787321fea0?q=80&w=400&auto=format&fit=crop">
+                    <div class="sp-track" data-title="I Will Always Love You" data-artist="Whitney Houston" data-src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" data-img="https://images.unsplash.com/photo-1504333638930-c8787321fea0?q=80&w=400&auto=format&fit=crop">
                         <div class="sp-track-left">
                             <span class="sp-track-num">2</span>
                             <div class="sp-track-details">
-                                <h5>Ecos de Ceniza</h5>
-                                <p>Chillwave</p>
+                                <h5>I Will Always Love You</h5>
+                                <p>Whitney Houston</p>
+                            </div>
+                        </div>
+                        <i class="ph-bold ph-dots-three"></i>
+                    </div>
+                    <div class="sp-track" data-title="I Love You" data-artist="Céline Dion" data-src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" data-img="https://images.unsplash.com/photo-1519074069444-1ba4fff66d16?q=80&w=400&auto=format&fit=crop">
+                        <div class="sp-track-left">
+                            <span class="sp-track-num">3</span>
+                            <div class="sp-track-details">
+                                <h5>I Love You</h5>
+                                <p>Céline Dion</p>
+                            </div>
+                        </div>
+                        <i class="ph-bold ph-dots-three"></i>
+                    </div>
+                    <div class="sp-track" data-title="No Puedo Vivir Sin Él" data-artist="KAROL G" data-src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" data-img="https://images.unsplash.com/photo-1633511116241-76b6b7aee295?q=80&w=400&auto=format&fit=crop">
+                        <div class="sp-track-left">
+                            <span class="sp-track-num">4</span>
+                            <div class="sp-track-details">
+                                <h5>No Puedo Vivir Sin Él</h5>
+                                <p>KAROL G</p>
                             </div>
                         </div>
                         <i class="ph-bold ph-dots-three"></i>
@@ -794,12 +976,47 @@
                     <button class="carousel-btn prev-btn" id="ig-prev"><i class="ph ph-caret-left"></i></button>
                     <div class="carousel-track-container">
                         <ul class="carousel-track" id="ig-track">
-                            <li class="carousel-slide active"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop" alt="Galeria 1"></li>
-                            <li class="carousel-slide"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=600&auto=format&fit=crop" alt="Galeria 2"></li>
-                            <li class="carousel-slide"><img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=600&auto=format&fit=crop" alt="Galeria 3"></li>
+                            <li class="carousel-slide active"><img src="https://i.imgur.com/OVuUgCb.png" alt="Galeria 1"></li>
+                            <li class="carousel-slide"><img src="https://i.imgur.com/S0G9WXP.png" alt="Galeria 2"></li>
+                            <li class="carousel-slide"><img src="https://i.imgur.com/hgZ0l2U.png" alt="Galeria 3"></li>
                         </ul>
                     </div>
                     <button class="carousel-btn next-btn" id="ig-next"><i class="ph ph-caret-right"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- NUEVA VISTA: AMIGOS (VÍNCULOS ETERNOS) -->
+        <div id="friends-view" class="view-container friends-layout">
+            <div class="yt-header"><h2 style="font-size: 1.4rem;">Amigos</h2></div>
+            <div class="friends-grid">
+                <div class="friend-item">
+                    <img src="https://i.imgur.com/OHhwmOE.jpeg" alt="Edgar" class="friend-avatar">
+                    <span class="friend-name">Edgar</span>
+                </div>
+                <div class="friend-item">
+                    <img src="https://i.imgur.com/OHhwmOE.jpeg" alt="Derek" class="friend-avatar">
+                    <span class="friend-name">Derek</span>
+                </div>
+                <div class="friend-item">
+                    <img src="https://i.imgur.com/OHhwmOE.jpeg" alt="Mila" class="friend-avatar">
+                    <span class="friend-name">Mila</span>
+                </div>
+                <div class="friend-item">
+                    <img src="https://i.imgur.com/OHhwmOE.jpeg" alt="Epika" class="friend-avatar">
+                    <span class="friend-name">Epika</span>
+                </div>
+                <div class="friend-item">
+                    <img src="https://i.imgur.com/OHhwmOE.jpeg" alt="Eam" class="friend-avatar">
+                    <span class="friend-name">Eam</span>
+                </div>
+            </div>
+        </div>
+
+             </div>
+                <div class="friend-item">
+                    <img src="https://i.imgur.com/OHhwmOE.jpeg" alt="Eam" class="friend-avatar">
+                    <span class="friend-name">Tekila</span>
                 </div>
             </div>
         </div>
@@ -842,10 +1059,25 @@
                 document.addEventListener('mousedown', () => cursor.classList.add('click'));
                 document.addEventListener('mouseup', () => cursor.classList.remove('click'));
 
-                const interactives = document.querySelectorAll('a, button, .dock-icon, .card, .calendar-day, .glass-button, .carousel-btn, .sp-controls i, .sp-progress-bar, .sp-track, .heart-photo, .close-workspace, img, .center-render-wrapper');
+                // Añadido .friend-item a la lista de interactivos para reaccionar al hover
+                const interactives = document.querySelectorAll('a, button, .dock-icon, .card, .calendar-day, .glass-button, .carousel-btn, .sp-controls i, .sp-progress-bar, .sp-track, .heart-photo, .close-workspace, img, .center-render-wrapper, .landing-btn, .friend-item');
                 interactives.forEach(el => {
                     el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
                     el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+                });
+            }
+
+            // --- LÓGICA DE LA PANTALLA DE INICIO (LANDING) ---
+            const landingScreen = document.getElementById('landing-screen');
+            const landingEnterBtn = document.getElementById('landing-enter-btn');
+            
+            if (landingEnterBtn && landingScreen) {
+                landingEnterBtn.addEventListener('click', () => {
+                    landingScreen.classList.add('hidden');
+                    // Remover del flujo DOM después de la transición para mejor rendimiento
+                    setTimeout(() => {
+                        landingScreen.style.display = 'none';
+                    }, 600);
                 });
             }
 
@@ -859,7 +1091,8 @@
                 home: document.getElementById('home-view'),
                 music: document.getElementById('music-view'),
                 youtube: document.getElementById('youtube-view'),
-                instagram: document.getElementById('instagram-view')
+                instagram: document.getElementById('instagram-view'),
+                friends: document.getElementById('friends-view') // Nueva vista de amigos añadida
             };
 
             function openWorkspace(viewId) {
@@ -881,11 +1114,12 @@
                 if(particlesBox) particlesBox.innerHTML = '';
             }
 
-            // Eventos de Navegación del Dock
+            // Eventos de Navegación del Dock (Añadido dock-friends)
             document.getElementById('dock-home').addEventListener('click', () => openWorkspace('home'));
             document.getElementById('dock-music').addEventListener('click', () => openWorkspace('music'));
             document.getElementById('dock-youtube').addEventListener('click', () => openWorkspace('youtube'));
             document.getElementById('dock-instagram').addEventListener('click', () => openWorkspace('instagram'));
+            document.getElementById('dock-friends').addEventListener('click', () => openWorkspace('friends'));
             
             // Botón de Cerrar Workspace
             if (closeWorkspaceBtn) {
@@ -1205,10 +1439,20 @@
             const lightbox = document.getElementById('image-lightbox');
             const lightboxImg = document.getElementById('lightbox-img');
             document.querySelectorAll('.carousel-slide img').forEach(img => { img.addEventListener('click', () => { lightboxImg.src = img.src; lightbox.classList.add('active'); }); });
-            const closeLB = () => lightbox.classList.remove('active');
-            document.getElementById('lightbox-close-btn')?.addEventListener('click', closeLB);
-            lightbox?.addEventListener('click', (e) => { if(e.target === lightbox) closeLB(); });
-            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLB(); });
+            
+            // Función Helper para cerrar Lightbox y prevenir errores en listener de Escape
+            function closeLightbox() {
+                lightbox.classList.remove('active');
+            }
+            
+            document.getElementById('lightbox-close-btn')?.addEventListener('click', closeLightbox);
+            lightbox?.addEventListener('click', (e) => { if(e.target === lightbox) closeLightbox(); });
+            
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && lightbox.classList.contains('active')) {
+                    closeLightbox();
+                }
+            });
 
             // --- Protección básica contra inspección y copia ---
             
